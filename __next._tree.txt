@@ -1,2 +1,2 @@
 :HL["/StratumX/_next/static/chunks/158f3f.c5yf8o.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}},"staleTime":300,"buildId":"APtvKppBTzcB02IEyUMIW"}
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}},"staleTime":300,"buildId":"-Trf8btMPtLw3CKOIwdr6"}
