@@ -1,13 +1,13 @@
+// palette-selector.tsx
 'use client';
 
-import { PaletteType, PALETTES } from '@/lib/wallpaper-generator';
+import { PaletteType } from '@/lib/wallpaper-generator';
 
 interface PaletteSelectorProps {
   value: PaletteType;
   onChange: (palette: PaletteType) => void;
 }
 
-// Map to fix the import
 const PALETTE_OPTIONS: Record<PaletteType, { name: string; colors: string[] }> = {
   monochrome: {
     name: 'Monochrome',
@@ -65,25 +65,42 @@ const PALETTE_OPTIONS: Record<PaletteType, { name: string; colors: string[] }> =
     name: 'Slate',
     colors: ['#1a1f2e', '#2d3f52', '#4a5f7a', '#6a7f9e', '#8fa3b8', '#b8d0e6', '#dfe8f2'],
   },
+  midnight: {
+    name: 'Midnight',
+    colors: ['#050a15', '#0d1b3d', '#1a2d5c', '#2d4a7d', '#4a7db8', '#7db8e8', '#e8f0ff'],
+  },
+  terra: {
+    name: 'Terra',
+    colors: ['#1a0f0a', '#3d2a1a', '#5c3d2d', '#7d5a4a', '#b88a7d', '#e8c9b8', '#fff5e8'],
+  },
+  neon: {
+    name: 'Neon',
+    colors: ['#0a0a0a', '#1a0a2d', '#2d0a5c', '#4a0a8b', '#7d3acd', '#b88aff', '#f5e6ff'],
+  },
 };
 
-const PALETTES_LIST: PaletteType[] = ['monochrome', 'sunset', 'emerald', 'violet', 'ocean', 'retro', 'aurora', 'forest', 'berry', 'peach', 'mint', 'lavender', 'coral', 'slate'];
+const PALETTES_LIST: PaletteType[] = [
+  'monochrome', 'sunset', 'emerald', 'violet', 'ocean', 
+  'retro', 'aurora', 'forest', 'berry', 'peach', 
+  'mint', 'lavender', 'coral', 'slate', 'midnight', 
+  'terra', 'neon'
+];
 
 export default function PaletteSelector({ value, onChange }: PaletteSelectorProps) {
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+    <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2">
       {PALETTES_LIST.map(palette => {
-        const { colors } = PALETTE_OPTIONS[palette];
+        const { colors, name } = PALETTE_OPTIONS[palette];
         return (
           <button
             key={palette}
             onClick={() => onChange(palette)}
-            className={`relative rounded-lg overflow-hidden border-2 transition-all h-10 sm:h-12 ${
+            className={`relative rounded-md overflow-hidden border-2 transition-all h-8 sm:h-10 ${
               value === palette
                 ? 'border-black dark:border-white shadow-md'
                 : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600'
             }`}
-            title={PALETTE_OPTIONS[palette].name}
+            title={name}
           >
             <div className="flex h-full">
               {colors.map((color, idx) => (
