@@ -2,7 +2,7 @@
 const nextConfig = {
   output: "export",
 
-  basePath: "/StratumX",
+  basePath: "/StratumXY",
 
   images: {
     unoptimized: true,

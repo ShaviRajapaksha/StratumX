@@ -1,8 +1,8 @@
-# StratumX
+# StratumXY
 
 > A procedural wallpaper generation platform for creating unique, high-quality digital wallpapers through dynamic visual systems, layered compositions, and algorithmic design.
 
-StratumX is a modern wallpaper generation application designed to transform procedural graphics into visually rich, customizable wallpapers for desktop and mobile devices.
+StratumXY is a modern wallpaper generation application designed to transform procedural graphics into visually rich, customizable wallpapers for desktop and mobile devices.
 
 The platform combines configurable visual layers, procedural generation, curated color systems, responsive device previews, and controlled randomization to create an effectively unlimited number of unique wallpaper compositions.
 
@@ -10,7 +10,7 @@ The platform combines configurable visual layers, procedural generation, curated
 
 ## Overview
 
-Traditional wallpaper platforms provide a fixed collection of pre-designed images. StratumX takes a different approach.
+Traditional wallpaper platforms provide a fixed collection of pre-designed images. StratumXY takes a different approach.
 
 Instead of selecting from a static library, users can generate unique wallpaper compositions dynamically. Each wallpaper is constructed from a set of visual parameters, including:
 
@@ -22,7 +22,7 @@ Instead of selecting from a static library, users can generate unique wallpaper 
 * Visual depth
 * Pattern variation
 
-By combining these parameters through a procedural generation system, StratumX can produce a virtually unlimited range of unique wallpaper designs.
+By combining these parameters through a procedural generation system, StratumXY can produce a virtually unlimited range of unique wallpaper designs.
 
 ---
 
@@ -60,7 +60,7 @@ This enables users to explore an effectively unlimited number of unique wallpape
 
 ### Curated Color Systems
 
-StratumX includes predefined color systems designed to maintain visual consistency across generated wallpapers.
+StratumXY includes predefined color systems designed to maintain visual consistency across generated wallpapers.
 
 Color palettes are applied across procedural layers to ensure that generated designs remain visually coherent while still allowing substantial variation.
 
@@ -83,7 +83,7 @@ The generation system is designed to support different display formats and resol
 
 ## Rendering Architecture
 
-StratumX uses a procedural rendering pipeline to transform configuration data into a final visual composition.
+StratumXY uses a procedural rendering pipeline to transform configuration data into a final visual composition.
 
 The rendering process can be represented as:
 
@@ -117,7 +117,7 @@ This allows the same configuration model to be used across:
 
 ## Design System
 
-StratumX follows a minimal, modern interface designed to keep the focus on the generated visual output.
+StratumXY follows a minimal, modern interface designed to keep the focus on the generated visual output.
 
 The application emphasizes:
 
@@ -165,7 +165,7 @@ The procedural system is designed to support future visual systems, including:
 
 ## Product Direction
 
-StratumX is designed to evolve from a procedural wallpaper generator into a broader creative generation platform.
+StratumXY is designed to evolve from a procedural wallpaper generator into a broader creative generation platform.
 
 Future capabilities may include:
 
@@ -184,7 +184,7 @@ Future capabilities may include:
 
 ## Application Status
 
-StratumX is an actively developed production application focused on procedural visual generation and digital wallpaper creation.
+StratumXY is an actively developed production application focused on procedural visual generation and digital wallpaper creation.
 
 The platform is designed with an extensible architecture that allows new generation systems and visual capabilities to be introduced without fundamentally changing the core application.
 

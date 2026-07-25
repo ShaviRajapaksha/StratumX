@@ -84,7 +84,7 @@ export default function Page() {
       const height = 2160;
 
       const canvas = await renderWallpaperToCanvas(width, height, config);
-      const filename = type === 'desktop' ? 'StratumX-desktop-4k.png' : 'StratumX-mobile.png';
+      const filename = type === 'desktop' ? 'StratumXY-desktop-4k.png' : 'StratumXY-mobile.png';
 
       await downloadWallpaper(canvas, filename);
     } catch (error) {
@@ -105,12 +105,12 @@ export default function Page() {
       {/* Header */}
       <header className={`border-b ${borderClass} ${bgClass} px-3 sm:px-8 py-3 sm:py-6`}>
         <div className="relative flex items-center justify-between max-w-full">
-          {/* Left - STRX and StratumX (desktop) */}
+          {/* Left - STRX and StratumXY (desktop) */}
           <div className="hidden lg:flex items-center gap-2 sm:gap-3">
             <div className={`${uiTheme === 'dark' ? 'bg-white text-black' : 'bg-black text-white'} px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-semibold`}>
               STRX
             </div>
-            <h1 className="text-xl sm:text-3xl font-bold tracking-tight">StratumX</h1>
+            <h1 className="text-xl sm:text-3xl font-bold tracking-tight">StratumXY</h1>
           </div>
 
           {/* Left - STRX only (mobile) */}
@@ -127,9 +127,9 @@ export default function Page() {
             </p>
           </div>
 
-          {/* Center - StratumX (mobile) */}
+          {/* Center - StratumXY (mobile) */}
           <div className="lg:hidden flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
-            <h1 className="text-xl font-bold tracking-tight">StratumX</h1>
+            <h1 className="text-xl font-bold tracking-tight">StratumXY</h1>
           </div>
 
           {/* Right - Theme toggle & Settings */}
@@ -418,7 +418,7 @@ export default function Page() {
       <footer className="border-t border-gray-200 dark:border-gray-800 px-4 sm:px-8 py-4 sm:py-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-gray-900 dark:text-white">StratumX</span>
+            <span className="font-semibold text-gray-900 dark:text-white">StratumXY</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
           <div className="flex items-center gap-1">

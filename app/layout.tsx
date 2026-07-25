@@ -3,12 +3,12 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'StratumX',
+  title: 'StratumXY',
   description:
     'Generate beautiful procedural wallpapers for your desktop and mobile devices',
 
   icons: {
-    icon: '/StratumX/icon.png',
+    icon: '/StratumXY/icon.png',
     apple: '/apple-icon.png',
   },
 }
