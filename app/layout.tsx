@@ -4,31 +4,18 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'StratumX',
-  description: 'Generate beautiful procedural wallpapers for your desktop and mobile devices',
+  description:
+    'Generate beautiful procedural wallpapers for your desktop and mobile devices',
+
   icons: {
-    icon: [
-      {
-        url: '/logo.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/logo.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.png',
-        type: 'image/svg+xml',
-      },
-    ],
+    icon: '/StratumX/icon.png',
     apple: '/apple-icon.png',
   },
 }
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-  ],
+  themeColor: 'white',
   userScalable: false,
 }
 
