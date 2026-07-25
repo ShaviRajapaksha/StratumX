@@ -257,25 +257,6 @@ export default function Page() {
                 className={`w-full accent-black dark:accent-white ${inputBgClass}`}
               />
             </div>
-
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className={`text-xs font-medium ${textSecondaryClass}`}>Height: {Math.round(config.heightAdjustment * 100)}%</label>
-              </div>
-              <input
-                type="range"
-                min="0.2"
-                max="1"
-                step="0.01"
-                value={config.heightAdjustment}
-                onChange={(e) => handleHeightAdjustmentChange(parseFloat(e.target.value))}
-                className={`w-full accent-black dark:accent-white ${inputBgClass}`}
-              />
-              <div className="flex justify-between text-[10px] text-gray-400 mt-1">
-                <span>More Depth</span>
-                <span>More Design</span>
-              </div>
-            </div>
           </div>
 
           <div className="mb-6">
