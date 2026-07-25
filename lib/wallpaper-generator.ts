@@ -1,4 +1,4 @@
-// wallpaper-generator.ts - Fixed height adjustment
+// wallpaper-generator.ts
 export type PatternType = 
   | 'stripes' 
   | 'layered-waves' 
@@ -8,12 +8,32 @@ export type PatternType =
   | 'layered-arches'
   | 'geometric'
   | 'gradient-mesh'
-  | 'topographic'
-  | 'fluid-blob'
-  | 'stripes-bottom'
-  | 'circles-bottom';
+  | 'liquid-mixed'
+  | 'abstract-flow'
+  | 'nebula'
+  | 'crystal'
+  | 'ripple'
+  | 'cosmic'
+  | 'fluid-blob';
 
-export type PaletteType = 'monochrome' | 'sunset' | 'emerald' | 'violet' | 'ocean' | 'retro' | 'aurora' | 'forest' | 'berry' | 'peach' | 'mint' | 'lavender' | 'coral' | 'slate';
+export type PaletteType = 
+  | 'monochrome' 
+  | 'sunset' 
+  | 'emerald' 
+  | 'violet' 
+  | 'ocean' 
+  | 'retro' 
+  | 'aurora' 
+  | 'forest' 
+  | 'berry' 
+  | 'peach' 
+  | 'mint' 
+  | 'lavender' 
+  | 'coral' 
+  | 'slate' 
+  | 'midnight' 
+  | 'terra' 
+  | 'neon';
 
 export interface WallpaperConfig {
   pattern: PatternType;
@@ -25,10 +45,10 @@ export interface WallpaperConfig {
   randomness: number;
   scale: number;
   rotation: number;
-  heightAdjustment: number; // 0-1, controls how much space design takes vs depth color
+  heightAdjustment: number;
 }
 
-// Color palettes
+// Color palettes - 17 total
 export const PALETTES: Record<PaletteType, string[]> = {
   monochrome: ['#000000', '#2a2a2a', '#555555', '#888888', '#bbbbbb', '#e8e8e8', '#ffffff'],
   sunset: ['#4a0e4e', '#8b3a62', '#c74a64', '#e87d5c', '#f5a563', '#f5d895', '#fffbe6'],
@@ -44,6 +64,28 @@ export const PALETTES: Record<PaletteType, string[]> = {
   lavender: ['#2d1b5c', '#5c3a8b', '#8b5acd', '#b88aff', '#d9b3ff', '#ecd9ff', '#f5f0ff'],
   coral: ['#4a1a1a', '#8b3232', '#c75050', '#ff7070', '#ff9999', '#ffb8b8', '#ffe6e6'],
   slate: ['#1a1f2e', '#2d3f52', '#4a5f7a', '#6a7f9e', '#8fa3b8', '#b8d0e6', '#dfe8f2'],
+  midnight: ['#050a15', '#0d1b3d', '#1a2d5c', '#2d4a7d', '#4a7db8', '#7db8e8', '#e8f0ff'],
+  terra: ['#1a0f0a', '#3d2a1a', '#5c3d2d', '#7d5a4a', '#b88a7d', '#e8c9b8', '#fff5e8'],
+  neon: ['#0a0a0a', '#1a0a2d', '#2d0a5c', '#4a0a8b', '#7d3acd', '#b88aff', '#f5e6ff'],
+};
+
+// Pattern labels for display
+export const PATTERN_LABELS: Record<PatternType, string> = {
+  stripes: 'Stripes',
+  'layered-waves': 'Layered Waves',
+  mountains: 'Mountains',
+  organic: 'Organic',
+  circles: 'Circles',
+  'layered-arches': 'Layered Arches',
+  geometric: 'Geometric',
+  'gradient-mesh': 'Gradient Mesh',
+  'liquid-mixed': 'Liquid Mixed',
+  'abstract-flow': 'Abstract Flow',
+  nebula: 'Nebula',
+  crystal: 'Crystal',
+  ripple: 'Ripple',
+  cosmic: 'Cosmic',
+  'fluid-blob': 'Fluid Blob',
 };
 
 // Pseudo-random number generator (seeded)
@@ -113,8 +155,8 @@ function interpolateColor(color1: string, color2: string, t: number): string {
   return rgbToHex(r, g, b);
 }
 
-// Get color for layer
-function getLayerColor(palette: string[], layerIndex: number, totalLayers: number, isReversed: boolean = false): string {
+// Get color for layer - exported for use in preview-mockups
+export function getLayerColor(palette: string[], layerIndex: number, totalLayers: number, isReversed: boolean = false): string {
   let t = layerIndex / (totalLayers - 1);
   if (isReversed) t = 1 - t;
   
@@ -128,353 +170,6 @@ function getLayerColor(palette: string[], layerIndex: number, totalLayers: numbe
   }
   
   return interpolateColor(palette[color1Index], palette[color2Index], colorT);
-}
-
-export function generateWallpaperSVG(
-  width: number,
-  height: number,
-  config: WallpaperConfig
-): string {
-  const palette = PALETTES[config.palette];
-  const isBottomAligned = config.pattern.includes('-bottom');
-  const basePattern = config.pattern.replace('-bottom', '') as PatternType;
-  const heightAdjustment = config.heightAdjustment || 0.6; // Default 60% for design, 40% for depth
-  
-  const layers = config.layerCount || 12;
-  
-  let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
-  
-  // Determine background color based on depth
-  let bgColor: string;
-  if (isBottomAligned) {
-    if (config.isReversed) {
-      bgColor = config.isDark ? palette[0] : palette[palette.length - 1];
-    } else {
-      bgColor = config.isDark ? palette[palette.length - 1] : palette[0];
-    }
-  } else {
-    bgColor = getLayerColor(palette, 0, layers, config.isReversed);
-  }
-  
-  svg += `<rect width="${width}" height="${height}" fill="${bgColor}"/>`;
-  
-  const waveAmp = seededRandom(config.seed + 1) * 0.3 + 0.1;
-  
-  // Handle different pattern types
-  if (basePattern === 'stripes') {
-    // Stripes pattern - simple horizontal bands
-    for (let i = 0; i < layers; i++) {
-      const yBase = (i / layers) * height;
-      const color = getLayerColor(palette, i, layers, config.isReversed);
-      const yEnd = (i + 1) / layers * height;
-      svg += `<rect x="0" y="${yBase}" width="${width}" height="${yEnd - yBase}" fill="${color}"/>`;
-    }
-  } else if (basePattern === 'layered-waves') {
-    // Layered Waves - smooth overlapping waves
-    const waveHeight = height * 0.3;
-    const waveCount = config.layerCount || 8;
-    
-    for (let i = 0; i < waveCount; i++) {
-      const t = i / waveCount;
-      const color = getLayerColor(palette, i, waveCount, config.isReversed);
-      const yOffset = t * height * 0.8 + height * 0.1;
-      const amplitude = waveHeight * (0.3 + t * 0.7) * config.scale;
-      const frequency = 2 + t * 3;
-      const phase = i * 0.5 + config.seed;
-      
-      svg += `<path d="`;
-      svg += `M 0,${yOffset + amplitude * 0.5} `;
-      
-      for (let x = 0; x <= width; x += width / 100) {
-        const noise = perlinNoise(x / width * frequency, phase, config.seed + i);
-        const offset = Math.sin(x / width * frequency * Math.PI * 2 + phase) * amplitude * 0.5 + noise * amplitude * 0.3 * config.randomness;
-        svg += `L ${x},${yOffset + offset} `;
-      }
-      
-      svg += `L ${width},${height} L 0,${height} Z" fill="${color}" opacity="${0.7 + t * 0.3}"/>`;
-    }
-  } else if (basePattern === 'layered-arches') {
-    // Layered Arches - nested arches/rainbows
-    const archCount = config.layerCount || 8;
-    const maxArchHeight = height * 0.9;
-    const minArchHeight = height * 0.1;
-    const centerX = width / 2;
-    
-    for (let i = archCount - 1; i >= 0; i--) {
-      const t = i / archCount;
-      const color = getLayerColor(palette, i, archCount, config.isReversed);
-      const archHeight = minArchHeight + t * maxArchHeight * config.scale;
-      const archWidth = archHeight * 1.2;
-      const yBase = height * (0.9 - t * 0.8);
-      
-      const xStart = centerX - archWidth;
-      const xEnd = centerX + archWidth;
-      
-      svg += `<path d="`;
-      svg += `M ${xStart},${yBase} `;
-      
-      // Arc using bezier curves for smooth arches
-      const cp1x = centerX - archWidth * 0.8;
-      const cp1y = yBase - archHeight * 0.9;
-      const cp2x = centerX + archWidth * 0.8;
-      const cp2y = yBase - archHeight * 0.9;
-      
-      svg += `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${xEnd},${yBase} `;
-      svg += `L ${xEnd},${height} L ${xStart},${height} Z" fill="${color}" opacity="${0.6 + t * 0.4}"/>`;
-    }
-  } else if (basePattern === 'mountains') {
-    // Mountain Landscape
-    const mountainCount = config.layerCount || 6;
-    
-    for (let i = 0; i < mountainCount; i++) {
-      const t = i / mountainCount;
-      const color = getLayerColor(palette, i, mountainCount, config.isReversed);
-      const yBase = height * (0.3 + t * 0.5);
-      const peakHeight = height * (0.2 + (1 - t) * 0.4) * config.scale;
-      const peakCount = Math.floor(3 + t * 5);
-      
-      svg += `<path d="`;
-      svg += `M 0,${yBase + peakHeight * 0.2} `;
-      
-      for (let j = 0; j <= peakCount; j++) {
-        const x = (j / peakCount) * width;
-        const noiseVal = perlinNoise(x / width * 5, i * 2, config.seed + 100);
-        const peakOffset = (noiseVal - 0.5) * 0.6 * (1 - t) * peakHeight;
-        const peakX = x + (noiseVal - 0.5) * width * 0.1;
-        const peakY = yBase - peakHeight * (0.3 + 0.7 * (1 - t) * (0.5 + 0.5 * Math.abs(noiseVal))) + peakOffset;
-        
-        if (j === 0) {
-          svg += `L ${peakX},${peakY} `;
-        } else {
-          const prevX = ((j - 1) / peakCount) * width;
-          const midX = (prevX + peakX) / 2;
-          const midY = yBase - peakHeight * (0.1 + 0.3 * (1 - t));
-          svg += `Q ${midX},${midY} ${peakX},${peakY} `;
-        }
-      }
-      
-      svg += `L ${width},${height} L 0,${height} Z" fill="${color}" opacity="${0.7 + t * 0.3}"/>`;
-    }
-  } else if (basePattern === 'organic') {
-    // Organic fluid blobs
-    const blobCount = config.layerCount || 8;
-    
-    for (let i = 0; i < blobCount; i++) {
-      const t = i / blobCount;
-      const color = getLayerColor(palette, i, blobCount, config.isReversed);
-      const centerX = (0.2 + t * 0.6) * width + (seededRandom(config.seed + i * 3) - 0.5) * width * 0.2;
-      const centerY = (0.2 + t * 0.6) * height + (seededRandom(config.seed + i * 7) - 0.5) * height * 0.2;
-      const size = (0.1 + t * 0.4) * Math.min(width, height) * config.scale * 0.5;
-      const points = 12 + Math.floor(t * 12);
-      
-      svg += `<path d="`;
-      for (let j = 0; j <= points; j++) {
-        const angle = (j / points) * Math.PI * 2;
-        const radiusNoise = perlinNoise(Math.cos(angle) * 2 + i, Math.sin(angle) * 2 + i, config.seed + 50);
-        const radius = size * (0.7 + 0.3 * Math.abs(radiusNoise)) * (1 + config.randomness * 0.2);
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius;
-        
-        if (j === 0) {
-          svg += `M ${x},${y} `;
-        } else {
-          const prevAngle = ((j - 1) / points) * Math.PI * 2;
-          const prevRadius = size * (0.7 + 0.3 * Math.abs(perlinNoise(Math.cos(prevAngle) * 2 + i, Math.sin(prevAngle) * 2 + i, config.seed + 50)));
-          const prevX = centerX + Math.cos(prevAngle) * prevRadius;
-          const prevY = centerY + Math.sin(prevAngle) * prevRadius;
-          const cpX = centerX + Math.cos((prevAngle + angle) / 2) * (prevRadius + radius) * 0.5;
-          const cpY = centerY + Math.sin((prevAngle + angle) / 2) * (prevRadius + radius) * 0.5;
-          svg += `Q ${cpX},${cpY} ${x},${y} `;
-        }
-      }
-      svg += `Z" fill="${color}" opacity="${0.4 + t * 0.6}"/>`;
-    }
-  } else if (basePattern === 'circles') {
-    // Circular pattern
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY) * 1.5;
-    
-    for (let i = layers - 1; i >= 0; i--) {
-      const t = i / layers;
-      const radius = t * maxRadius * config.scale;
-      const noiseVal = perlinNoise(t * 3, config.seed, config.seed);
-      const waveOffset = noiseVal * waveAmp * 0.15 * maxRadius * config.randomness;
-      const finalRadius = Math.max(0, radius + waveOffset);
-      
-      const color = getLayerColor(palette, i, layers, config.isReversed);
-      svg += `<circle cx="${centerX}" cy="${centerY}" r="${finalRadius}" fill="${color}" stroke="none"/>`;
-    }
-  } else if (basePattern === 'geometric') {
-    // Geometric patterns
-    const shapeCount = config.layerCount || 12;
-    const shapes = ['rect', 'circle', 'triangle', 'polygon'];
-    
-    for (let i = 0; i < shapeCount; i++) {
-      const t = i / shapeCount;
-      const color = getLayerColor(palette, i, shapeCount, config.isReversed);
-      const size = (0.05 + t * 0.3) * Math.min(width, height) * config.scale;
-      const x = (seededRandom(config.seed + i * 5) * 0.6 + 0.2) * width;
-      const y = (seededRandom(config.seed + i * 13) * 0.6 + 0.2) * height;
-      const rotation = (seededRandom(config.seed + i * 7) * 360 + config.rotation) % 360;
-      const shape = shapes[Math.floor(seededRandom(config.seed + i * 11) * shapes.length)];
-      
-      svg += `<g transform="translate(${x},${y}) rotate(${rotation})">`;
-      
-      if (shape === 'rect') {
-        const w = size * (0.5 + seededRandom(config.seed + i * 3) * 0.5);
-        const h = size * (0.5 + seededRandom(config.seed + i * 17) * 0.5);
-        const rx = size * 0.1 * seededRandom(config.seed + i * 23);
-        svg += `<rect x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" rx="${rx}" fill="${color}" opacity="${0.3 + t * 0.7}"/>`;
-      } else if (shape === 'circle') {
-        const r = size * 0.4;
-        svg += `<circle cx="0" cy="0" r="${r}" fill="${color}" opacity="${0.3 + t * 0.7}"/>`;
-      } else if (shape === 'triangle') {
-        svg += `<polygon points="0,${-size * 0.4} ${size * 0.4},${size * 0.4} ${-size * 0.4},${size * 0.4}" fill="${color}" opacity="${0.3 + t * 0.7}"/>`;
-      } else if (shape === 'polygon') {
-        const sides = 5 + Math.floor(seededRandom(config.seed + i * 31) * 5);
-        let points = '';
-        for (let j = 0; j < sides; j++) {
-          const angle = (j / sides) * Math.PI * 2;
-          const r = size * 0.4 * (0.8 + 0.2 * seededRandom(config.seed + i * 37 + j));
-          points += `${Math.cos(angle) * r},${Math.sin(angle) * r} `;
-        }
-        svg += `<polygon points="${points}" fill="${color}" opacity="${0.3 + t * 0.7}"/>`;
-      }
-      
-      svg += `</g>`;
-    }
-  } else if (basePattern === 'gradient-mesh') {
-    // Gradient Mesh - smooth color blobs
-    const blobCount = config.layerCount || 10;
-    
-    for (let i = 0; i < blobCount; i++) {
-      const t = i / blobCount;
-      const color = getLayerColor(palette, i, blobCount, config.isReversed);
-      const x = (seededRandom(config.seed + i * 7) * 0.8 + 0.1) * width;
-      const y = (seededRandom(config.seed + i * 13) * 0.8 + 0.1) * height;
-      const radius = (0.1 + t * 0.3) * Math.min(width, height) * config.scale;
-      
-      // Create radial gradient
-      const gradId = `grad-${i}`;
-      svg += `<defs><radialGradient id="${gradId}">
-        <stop offset="0%" stop-color="${color}" stop-opacity="0.8"/>
-        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-      </radialGradient></defs>`;
-      
-      svg += `<circle cx="${x}" cy="${y}" r="${radius}" fill="url(#${gradId})" opacity="${0.3 + t * 0.7}"/>`;
-    }
-  } else if (basePattern === 'topographic') {
-    // Topographic contour lines
-    const contourCount = config.layerCount || 8;
-    
-    for (let i = 0; i < contourCount; i++) {
-      const t = i / contourCount;
-      const color = getLayerColor(palette, i, contourCount, config.isReversed);
-      
-      svg += `<path d="`;
-      let first = true;
-      const points = 60;
-      
-      for (let j = 0; j <= points; j++) {
-        const u = j / points;
-        const x = u * width;
-        let y = 0;
-        
-        for (let k = 0; k < 3; k++) {
-          const freq = 2 + k * 2 + t * 2;
-          const amp = (0.1 + t * 0.3) * height * config.scale;
-          const phase = config.seed + i * 10 + k * 7;
-          const noise = perlinNoise(x / width * freq * 2 + i, t * 3 + k, phase);
-          y += Math.sin(x / width * freq * Math.PI * 2 + phase) * amp * 0.3 + noise * amp * 0.3 * config.randomness;
-        }
-        
-        y = height * (0.1 + t * 0.8) + y * 0.5;
-        
-        if (first) {
-          svg += `M ${x},${y} `;
-          first = false;
-        } else {
-          svg += `L ${x},${y} `;
-        }
-      }
-      
-      svg += `" fill="none" stroke="${color}" stroke-width="${1 + t * 3}" opacity="${0.3 + t * 0.7}"/>`;
-    }
-  } else if (basePattern === 'fluid-blob') {
-    // Fluid Blob - organic overlapping blobs
-    const blobCount = config.layerCount || 8;
-    
-    for (let i = 0; i < blobCount; i++) {
-      const t = i / blobCount;
-      const color = getLayerColor(palette, i, blobCount, config.isReversed);
-      const centerX = (0.1 + t * 0.8) * width + (seededRandom(config.seed + i * 5) - 0.5) * width * 0.2;
-      const centerY = (0.1 + t * 0.8) * height + (seededRandom(config.seed + i * 13) - 0.5) * height * 0.2;
-      const size = (0.1 + t * 0.4) * Math.min(width, height) * config.scale;
-      const points = 16 + Math.floor(t * 16);
-      
-      svg += `<path d="`;
-      for (let j = 0; j <= points; j++) {
-        const angle = (j / points) * Math.PI * 2;
-        const noise1 = perlinNoise(Math.cos(angle) * 3 + i * 2, Math.sin(angle) * 3 + i * 2, config.seed + 100);
-        const noise2 = perlinNoise(Math.cos(angle) * 5 + i * 3, Math.sin(angle) * 5 + i * 3, config.seed + 200);
-        const radius = size * (0.6 + 0.4 * Math.abs(noise1 + noise2 * 0.3)) * (1 + config.randomness * 0.1);
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius;
-        
-        if (j === 0) {
-          svg += `M ${x},${y} `;
-        } else {
-          const prevAngle = ((j - 1) / points) * Math.PI * 2;
-          const prevNoise1 = perlinNoise(Math.cos(prevAngle) * 3 + i * 2, Math.sin(prevAngle) * 3 + i * 2, config.seed + 100);
-          const prevNoise2 = perlinNoise(Math.cos(prevAngle) * 5 + i * 3, Math.sin(prevAngle) * 5 + i * 3, config.seed + 200);
-          const prevRadius = size * (0.6 + 0.4 * Math.abs(prevNoise1 + prevNoise2 * 0.3)) * (1 + config.randomness * 0.1);
-          const prevX = centerX + Math.cos(prevAngle) * prevRadius;
-          const prevY = centerY + Math.sin(prevAngle) * prevRadius;
-          
-          const cpX = (prevX + x) / 2 + (seededRandom(config.seed + i * 7 + j) - 0.5) * size * 0.2;
-          const cpY = (prevY + y) / 2 + (seededRandom(config.seed + i * 11 + j) - 0.5) * size * 0.2;
-          svg += `Q ${cpX},${cpY} ${x},${y} `;
-        }
-      }
-      svg += `Z" fill="${color}" opacity="${0.3 + t * 0.7}"/>`;
-    }
-  } else if (isBottomAligned) {
-    // Bottom-aligned patterns - FIXED to use heightAdjustment properly
-    const patternStartY = height * (1 - heightAdjustment);
-    const patternHeight = height * heightAdjustment;
-    const patternLayers = Math.max(2, Math.ceil(layers * heightAdjustment));
-    const bottomLayerHeight = patternHeight / patternLayers;
-    
-    if (basePattern.includes('stripes')) {
-      for (let i = 0; i < patternLayers; i++) {
-        const yBase = patternStartY + (i / patternLayers) * patternHeight;
-        const color = getLayerColor(palette, i, patternLayers, config.isReversed);
-        const yEnd = patternStartY + ((i + 1) / patternLayers) * patternHeight;
-        svg += `<rect x="0" y="${yBase}" width="${width}" height="${yEnd - yBase}" fill="${color}"/>`;
-      }
-    } else if (basePattern.includes('circles')) {
-      // Circles at bottom - expanded to cover desktop width
-      const centerX = width / 2;
-      const centerY = height;
-      const maxRadius = Math.max(width, height) * 0.8 * config.scale;
-      const gapFactor = config.randomness > 0 ? 1 + config.randomness * 0.3 : 1;
-      
-      for (let i = patternLayers - 1; i >= 0; i--) {
-        const t = i / patternLayers;
-        const baseRadius = t * maxRadius * gapFactor;
-        const noiseVal = perlinNoise(t * 3, config.seed, config.seed);
-        const waveOffset = noiseVal * waveAmp * 0.15 * maxRadius * config.randomness;
-        const finalRadius = Math.max(0, baseRadius + waveOffset);
-        
-        const color = getLayerColor(palette, i, patternLayers, config.isReversed);
-        svg += `<circle cx="${centerX}" cy="${centerY}" r="${finalRadius}" fill="${color}" stroke="none"/>`;
-      }
-    }
-  }
-  
-  svg += '</svg>';
-  return svg;
 }
 
 export async function renderWallpaperToCanvas(
@@ -509,6 +204,14 @@ export async function renderWallpaperToCanvas(
   ctx.fillRect(0, 0, width, height);
   
   const waveAmp = (seededRandom(config.seed + 1) * 0.3 + 0.1) * (config.randomness || 1);
+  
+  // Save context for rotation
+  ctx.save();
+  const centerX = width / 2;
+  const centerY = height / 2;
+  ctx.translate(centerX, centerY);
+  ctx.rotate((config.rotation || 0) * Math.PI / 180);
+  ctx.translate(-centerX, -centerY);
   
   // Handle different pattern types
   if (basePattern === 'stripes') {
@@ -552,7 +255,7 @@ export async function renderWallpaperToCanvas(
     const archCount = config.layerCount || 8;
     const maxArchHeight = height * 0.9;
     const minArchHeight = height * 0.1;
-    const centerX = width / 2;
+    const centerX2 = width / 2;
     
     for (let i = archCount - 1; i >= 0; i--) {
       const t = i / archCount;
@@ -561,17 +264,17 @@ export async function renderWallpaperToCanvas(
       const archWidth = archHeight * 1.2;
       const yBase = height * (0.9 - t * 0.8);
       
-      const xStart = centerX - archWidth;
-      const xEnd = centerX + archWidth;
+      const xStart = centerX2 - archWidth;
+      const xEnd = centerX2 + archWidth;
       
       ctx.fillStyle = color;
       ctx.globalAlpha = 0.6 + t * 0.4;
       ctx.beginPath();
       ctx.moveTo(xStart, yBase);
       
-      const cp1x = centerX - archWidth * 0.8;
+      const cp1x = centerX2 - archWidth * 0.8;
       const cp1y = yBase - archHeight * 0.9;
-      const cp2x = centerX + archWidth * 0.8;
+      const cp2x = centerX2 + archWidth * 0.8;
       const cp2y = yBase - archHeight * 0.9;
       
       ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, xEnd, yBase);
@@ -625,8 +328,8 @@ export async function renderWallpaperToCanvas(
     for (let i = 0; i < blobCount; i++) {
       const t = i / blobCount;
       const color = getLayerColor(palette, i, blobCount, config.isReversed);
-      const centerX = (0.2 + t * 0.6) * width + (seededRandom(config.seed + i * 3) - 0.5) * width * 0.2;
-      const centerY = (0.2 + t * 0.6) * height + (seededRandom(config.seed + i * 7) - 0.5) * height * 0.2;
+      const centerX2 = (0.2 + t * 0.6) * width + (seededRandom(config.seed + i * 3) - 0.5) * width * 0.2;
+      const centerY2 = (0.2 + t * 0.6) * height + (seededRandom(config.seed + i * 7) - 0.5) * height * 0.2;
       const size = (0.1 + t * 0.4) * Math.min(width, height) * config.scale * 0.5;
       const points = 12 + Math.floor(t * 12);
       
@@ -638,18 +341,18 @@ export async function renderWallpaperToCanvas(
         const angle = (j / points) * Math.PI * 2;
         const radiusNoise = perlinNoise(Math.cos(angle) * 2 + i, Math.sin(angle) * 2 + i, config.seed + 50);
         const radius = size * (0.7 + 0.3 * Math.abs(radiusNoise)) * (1 + config.randomness * 0.2);
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius;
+        const x = centerX2 + Math.cos(angle) * radius;
+        const y = centerY2 + Math.sin(angle) * radius;
         
         if (j === 0) {
           ctx.moveTo(x, y);
         } else {
           const prevAngle = ((j - 1) / points) * Math.PI * 2;
           const prevRadius = size * (0.7 + 0.3 * Math.abs(perlinNoise(Math.cos(prevAngle) * 2 + i, Math.sin(prevAngle) * 2 + i, config.seed + 50)));
-          const prevX = centerX + Math.cos(prevAngle) * prevRadius;
-          const prevY = centerY + Math.sin(prevAngle) * prevRadius;
-          const cpX = centerX + Math.cos((prevAngle + angle) / 2) * (prevRadius + radius) * 0.5;
-          const cpY = centerY + Math.sin((prevAngle + angle) / 2) * (prevRadius + radius) * 0.5;
+          const prevX = centerX2 + Math.cos(prevAngle) * prevRadius;
+          const prevY = centerY2 + Math.sin(prevAngle) * prevRadius;
+          const cpX = centerX2 + Math.cos((prevAngle + angle) / 2) * (prevRadius + radius) * 0.5;
+          const cpY = centerY2 + Math.sin((prevAngle + angle) / 2) * (prevRadius + radius) * 0.5;
           ctx.quadraticCurveTo(cpX, cpY, x, y);
         }
       }
@@ -658,9 +361,9 @@ export async function renderWallpaperToCanvas(
       ctx.globalAlpha = 1;
     }
   } else if (basePattern === 'circles') {
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY) * 1.5;
+    const centerX2 = width / 2;
+    const centerY2 = height / 2;
+    const maxRadius = Math.sqrt(centerX2 * centerX2 + centerY2 * centerY2) * 1.5;
     
     for (let i = layers - 1; i >= 0; i--) {
       const t = i / layers;
@@ -672,7 +375,7 @@ export async function renderWallpaperToCanvas(
       const color = getLayerColor(palette, i, layers, config.isReversed);
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.arc(centerX, centerY, finalRadius, 0, Math.PI * 2);
+      ctx.arc(centerX2, centerY2, finalRadius, 0, Math.PI * 2);
       ctx.fill();
     }
   } else if (basePattern === 'geometric') {
@@ -685,12 +388,10 @@ export async function renderWallpaperToCanvas(
       const size = (0.05 + t * 0.3) * Math.min(width, height) * config.scale;
       const x = (seededRandom(config.seed + i * 5) * 0.6 + 0.2) * width;
       const y = (seededRandom(config.seed + i * 13) * 0.6 + 0.2) * height;
-      const rotation = (seededRandom(config.seed + i * 7) * 360 + config.rotation) % 360;
       const shape = shapes[Math.floor(seededRandom(config.seed + i * 11) * shapes.length)];
       
       ctx.save();
       ctx.translate(x, y);
-      ctx.rotate(rotation * Math.PI / 180);
       ctx.fillStyle = color;
       ctx.globalAlpha = 0.3 + t * 0.7;
       
@@ -749,44 +450,219 @@ export async function renderWallpaperToCanvas(
       ctx.fill();
       ctx.globalAlpha = 1;
     }
-  } else if (basePattern === 'topographic') {
-    const contourCount = config.layerCount || 8;
+  } else if (basePattern === 'liquid-mixed') {
+    const layerCount = config.layerCount || 10;
     
-    for (let i = 0; i < contourCount; i++) {
-      const t = i / contourCount;
-      const color = getLayerColor(palette, i, contourCount, config.isReversed);
+    for (let i = 0; i < layerCount; i++) {
+      const t = i / layerCount;
+      const color = getLayerColor(palette, i, layerCount, config.isReversed);
+      const centerX2 = (0.1 + t * 0.8) * width + (seededRandom(config.seed + i * 7) - 0.5) * width * 0.15;
+      const centerY2 = (0.1 + t * 0.8) * height + (seededRandom(config.seed + i * 13) - 0.5) * height * 0.15;
+      const size = (0.05 + t * 0.35) * Math.min(width, height) * config.scale;
+      const points = 20 + Math.floor(t * 20);
       
-      ctx.strokeStyle = color;
-      ctx.globalAlpha = 0.3 + t * 0.7;
-      ctx.lineWidth = 1 + t * 3;
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.2 + t * 0.6;
       ctx.beginPath();
       
-      let first = true;
-      const points = 60;
-      
       for (let j = 0; j <= points; j++) {
-        const u = j / points;
-        const x = u * width;
-        let y = 0;
+        const angle = (j / points) * Math.PI * 2;
+        const noise1 = perlinNoise(Math.cos(angle) * 4 + i * 3, Math.sin(angle) * 4 + i * 3, config.seed + 100);
+        const noise2 = perlinNoise(Math.cos(angle) * 6 + i * 5, Math.sin(angle) * 6 + i * 5, config.seed + 200);
+        const noise3 = perlinNoise(Math.cos(angle) * 2 + i, Math.sin(angle) * 2 + i, config.seed + 50);
+        const radius = size * (0.5 + 0.5 * Math.abs(noise1 + noise2 * 0.3 + noise3 * 0.2)) * (1 + config.randomness * 0.15);
+        const x = centerX2 + Math.cos(angle + noise3 * 0.5) * radius;
+        const y = centerY2 + Math.sin(angle + noise3 * 0.5) * radius;
         
-        for (let k = 0; k < 3; k++) {
-          const freq = 2 + k * 2 + t * 2;
-          const amp = (0.1 + t * 0.3) * height * config.scale;
-          const phase = config.seed + i * 10 + k * 7;
-          const noise = perlinNoise(x / width * freq * 2 + i, t * 3 + k, phase);
-          y += Math.sin(x / width * freq * Math.PI * 2 + phase) * amp * 0.3 + noise * amp * 0.3 * config.randomness;
-        }
-        
-        y = height * (0.1 + t * 0.8) + y * 0.5;
-        
-        if (first) {
+        if (j === 0) {
           ctx.moveTo(x, y);
-          first = false;
         } else {
           ctx.lineTo(x, y);
         }
       }
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  } else if (basePattern === 'abstract-flow') {
+    const flowCount = config.layerCount || 8;
+    
+    for (let i = 0; i < flowCount; i++) {
+      const t = i / flowCount;
+      const color = getLayerColor(palette, i, flowCount, config.isReversed);
+      const yBase = t * height;
+      const amplitude = (0.1 + t * 0.3) * height * 0.3 * config.scale;
+      const frequency = 1 + t * 4;
       
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.4 + t * 0.6;
+      ctx.lineWidth = 2 + t * 12;
+      ctx.beginPath();
+      
+      for (let x = 0; x <= width; x += 2) {
+        const noiseVal = perlinNoise(x / width * frequency, t * 3, config.seed + i * 10);
+        const flowOffset = Math.sin(x / width * frequency * Math.PI * 2 + config.seed) * amplitude * 0.5;
+        const flowOffset2 = Math.cos(x / width * frequency * 0.7 * Math.PI * 2 + config.seed * 0.5) * amplitude * 0.3;
+        const y = yBase + flowOffset + flowOffset2 + noiseVal * amplitude * 0.3 * config.randomness;
+        
+        if (x === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          const prevX = x - 2;
+          const prevNoiseVal = perlinNoise(prevX / width * frequency, t * 3, config.seed + i * 10);
+          const prevFlowOffset = Math.sin(prevX / width * frequency * Math.PI * 2 + config.seed) * amplitude * 0.5;
+          const prevFlowOffset2 = Math.cos(prevX / width * frequency * 0.7 * Math.PI * 2 + config.seed * 0.5) * amplitude * 0.3;
+          const prevY = yBase + prevFlowOffset + prevFlowOffset2 + prevNoiseVal * amplitude * 0.3 * config.randomness;
+          const cpX = (prevX + x) / 2;
+          const cpY = (prevY + y) / 2 + (seededRandom(config.seed + i * 5 + x) - 0.5) * amplitude * 0.2;
+          ctx.quadraticCurveTo(cpX, cpY, x, y);
+        }
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  } else if (basePattern === 'nebula') {
+    const cloudCount = config.layerCount || 12;
+    
+    for (let i = 0; i < cloudCount; i++) {
+      const t = i / cloudCount;
+      const color = getLayerColor(palette, i, cloudCount, config.isReversed);
+      const x = (seededRandom(config.seed + i * 11) * 0.9 + 0.05) * width;
+      const y = (seededRandom(config.seed + i * 17) * 0.9 + 0.05) * height;
+      const radius = (0.05 + t * 0.4) * Math.min(width, height) * config.scale;
+      
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      gradient.addColorStop(0, color);
+      const endColor = color + '00';
+      gradient.addColorStop(1, endColor);
+      
+      ctx.fillStyle = gradient;
+      ctx.globalAlpha = 0.1 + t * 0.5;
+      ctx.beginPath();
+      
+      const points = 24;
+      for (let j = 0; j <= points; j++) {
+        const angle = (j / points) * Math.PI * 2;
+        const noise1 = perlinNoise(Math.cos(angle) * 5 + i * 2, Math.sin(angle) * 5 + i * 2, config.seed + 300);
+        const noise2 = perlinNoise(Math.cos(angle) * 8 + i * 3, Math.sin(angle) * 8 + i * 3, config.seed + 400);
+        const r = radius * (0.7 + 0.3 * Math.abs(noise1 + noise2 * 0.2)) * (1 + config.randomness * 0.1);
+        const px = x + Math.cos(angle) * r;
+        const py = y + Math.sin(angle) * r;
+        
+        if (j === 0) {
+          ctx.moveTo(px, py);
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  } else if (basePattern === 'crystal') {
+    const crystalCount = config.layerCount || 10;
+    
+    for (let i = 0; i < crystalCount; i++) {
+      const t = i / crystalCount;
+      const color = getLayerColor(palette, i, crystalCount, config.isReversed);
+      const size = (0.03 + t * 0.25) * Math.min(width, height) * config.scale;
+      const x = (seededRandom(config.seed + i * 5) * 0.7 + 0.15) * width;
+      const y = (seededRandom(config.seed + i * 13) * 0.7 + 0.15) * height;
+      const sides = 5 + Math.floor(seededRandom(config.seed + i * 19) * 4);
+      const skew = seededRandom(config.seed + i * 23) * 0.3;
+      
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.4 + t * 0.6;
+      ctx.beginPath();
+      
+      for (let j = 0; j < sides; j++) {
+        const angle = (j / sides) * Math.PI * 2;
+        const r = size * (0.8 + 0.2 * Math.sin(j * 1.7 + skew));
+        const px = Math.cos(angle) * r * (1 + skew * 0.2);
+        const py = Math.sin(angle) * r * (1 - skew * 0.2);
+        
+        if (j === 0) {
+          ctx.moveTo(px, py);
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+  } else if (basePattern === 'ripple') {
+    const rippleCount = config.layerCount || 8;
+    const centerX2 = width / 2;
+    const centerY2 = height / 2;
+    const maxRadius = Math.min(width, height) * 0.9 * config.scale;
+    
+    for (let i = 0; i < rippleCount; i++) {
+      const t = i / rippleCount;
+      const color = getLayerColor(palette, i, rippleCount, config.isReversed);
+      const radius = (0.05 + t * 0.9) * maxRadius;
+      const waveOffset = Math.sin(t * 10 + config.seed) * 0.05 * maxRadius * config.randomness;
+      const finalRadius = Math.max(0, radius + waveOffset);
+      
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.2 + t * 0.8;
+      ctx.lineWidth = 1 + t * 8;
+      ctx.beginPath();
+      
+      const points = 60;
+      for (let j = 0; j <= points; j++) {
+        const angle = (j / points) * Math.PI * 2;
+        const noiseVal = perlinNoise(Math.cos(angle) * 3 + i, Math.sin(angle) * 3 + i, config.seed + 500);
+        const r = finalRadius * (1 + noiseVal * 0.1 * config.randomness);
+        const px = centerX2 + Math.cos(angle) * r;
+        const py = centerY2 + Math.sin(angle) * r;
+        
+        if (j === 0) {
+          ctx.moveTo(px, py);
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  } else if (basePattern === 'cosmic') {
+    const swirlCount = config.layerCount || 10;
+    const centerX2 = width / 2;
+    const centerY2 = height / 2;
+    
+    for (let i = 0; i < swirlCount; i++) {
+      const t = i / swirlCount;
+      const color = getLayerColor(palette, i, swirlCount, config.isReversed);
+      const radius = (0.05 + t * 0.45) * Math.min(width, height) * config.scale;
+      const startAngle = t * 5 + config.seed * 0.1;
+      const endAngle = startAngle + Math.PI * 2 * (0.5 + t * 0.5);
+      
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.1 + t * 0.7;
+      ctx.lineWidth = 1 + t * 15;
+      ctx.beginPath();
+      
+      const points = 40;
+      for (let j = 0; j <= points; j++) {
+        const progress = j / points;
+        const angle = startAngle + (endAngle - startAngle) * progress;
+        const r = radius * (0.3 + 0.7 * progress);
+        const noiseVal = perlinNoise(Math.cos(angle) * 2 + i * 2, Math.sin(angle) * 2 + i * 2, config.seed + 600);
+        const finalR = r * (1 + noiseVal * 0.2 * config.randomness);
+        const px = centerX2 + Math.cos(angle) * finalR;
+        const py = centerY2 + Math.sin(angle) * finalR;
+        
+        if (j === 0) {
+          ctx.moveTo(px, py);
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
       ctx.stroke();
       ctx.globalAlpha = 1;
     }
@@ -796,8 +672,8 @@ export async function renderWallpaperToCanvas(
     for (let i = 0; i < blobCount; i++) {
       const t = i / blobCount;
       const color = getLayerColor(palette, i, blobCount, config.isReversed);
-      const centerX = (0.1 + t * 0.8) * width + (seededRandom(config.seed + i * 5) - 0.5) * width * 0.2;
-      const centerY = (0.1 + t * 0.8) * height + (seededRandom(config.seed + i * 13) - 0.5) * height * 0.2;
+      const centerX2 = (0.1 + t * 0.8) * width + (seededRandom(config.seed + i * 5) - 0.5) * width * 0.2;
+      const centerY2 = (0.1 + t * 0.8) * height + (seededRandom(config.seed + i * 13) - 0.5) * height * 0.2;
       const size = (0.1 + t * 0.4) * Math.min(width, height) * config.scale;
       const points = 16 + Math.floor(t * 16);
       
@@ -810,8 +686,8 @@ export async function renderWallpaperToCanvas(
         const noise1 = perlinNoise(Math.cos(angle) * 3 + i * 2, Math.sin(angle) * 3 + i * 2, config.seed + 100);
         const noise2 = perlinNoise(Math.cos(angle) * 5 + i * 3, Math.sin(angle) * 5 + i * 3, config.seed + 200);
         const radius = size * (0.6 + 0.4 * Math.abs(noise1 + noise2 * 0.3)) * (1 + config.randomness * 0.1);
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius;
+        const x = centerX2 + Math.cos(angle) * radius;
+        const y = centerY2 + Math.sin(angle) * radius;
         
         if (j === 0) {
           ctx.moveTo(x, y);
@@ -820,8 +696,8 @@ export async function renderWallpaperToCanvas(
           const prevNoise1 = perlinNoise(Math.cos(prevAngle) * 3 + i * 2, Math.sin(prevAngle) * 3 + i * 2, config.seed + 100);
           const prevNoise2 = perlinNoise(Math.cos(prevAngle) * 5 + i * 3, Math.sin(prevAngle) * 5 + i * 3, config.seed + 200);
           const prevRadius = size * (0.6 + 0.4 * Math.abs(prevNoise1 + prevNoise2 * 0.3)) * (1 + config.randomness * 0.1);
-          const prevX = centerX + Math.cos(prevAngle) * prevRadius;
-          const prevY = centerY + Math.sin(prevAngle) * prevRadius;
+          const prevX = centerX2 + Math.cos(prevAngle) * prevRadius;
+          const prevY = centerY2 + Math.sin(prevAngle) * prevRadius;
           
           const cpX = (prevX + x) / 2 + (seededRandom(config.seed + i * 7 + j) - 0.5) * size * 0.2;
           const cpY = (prevY + y) / 2 + (seededRandom(config.seed + i * 11 + j) - 0.5) * size * 0.2;
@@ -833,11 +709,9 @@ export async function renderWallpaperToCanvas(
       ctx.globalAlpha = 1;
     }
   } else if (isBottomAligned) {
-    // Bottom-aligned patterns - FIXED to use heightAdjustment properly
     const patternStartY = height * (1 - heightAdjustment);
     const patternHeight = height * heightAdjustment;
     const patternLayers = Math.max(2, Math.ceil(layers * heightAdjustment));
-    const bottomLayerHeight = patternHeight / patternLayers;
     
     if (basePattern === 'stripes-bottom') {
       for (let i = 0; i < patternLayers; i++) {
@@ -848,8 +722,8 @@ export async function renderWallpaperToCanvas(
         ctx.fillRect(0, yBase, width, yEnd - yBase);
       }
     } else if (basePattern === 'circles-bottom') {
-      const centerX = width / 2;
-      const centerY = height;
+      const centerX2 = width / 2;
+      const centerY2 = height;
       const maxRadius = Math.max(width, height) * 0.8 * config.scale;
       const gapFactor = config.randomness > 0 ? 1 + config.randomness * 0.3 : 1;
       
@@ -863,11 +737,13 @@ export async function renderWallpaperToCanvas(
         const color = getLayerColor(palette, i, patternLayers, config.isReversed);
         ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, finalRadius, 0, Math.PI * 2);
+        ctx.arc(centerX2, centerY2, finalRadius, 0, Math.PI * 2);
         ctx.fill();
       }
     }
   }
+  
+  ctx.restore();
   
   return canvas;
 }
