@@ -77,18 +77,31 @@ const PALETTE_OPTIONS: Record<PaletteType, { name: string; colors: string[] }> =
     name: 'Neon',
     colors: ['#0a0a0a', '#1a0a2d', '#2d0a5c', '#4a0a8b', '#7d3acd', '#b88aff', '#f5e6ff'],
   },
+  // 3 new palettes
+  autumn: {
+    name: 'Autumn',
+    colors: ['#3d1a0a', '#7d3a1a', '#b85c2d', '#e8844a', '#f5a56b', '#f5d08d', '#fff5e6'],
+  },
+  arctic: {
+    name: 'Arctic',
+    colors: ['#0a1a2a', '#1a3d5c', '#2d6a8b', '#4a9db8', '#7dd0e8', '#b8e8f5', '#e6f5ff'],
+  },
+  desert: {
+    name: 'Desert',
+    colors: ['#2a1a0a', '#5c3d1a', '#8b5c2d', '#b8844a', '#e8b87d', '#f5d9b8', '#fff5e6'],
+  },
 };
 
 const PALETTES_LIST: PaletteType[] = [
-  'monochrome', 'sunset', 'emerald', 'violet', 'ocean', 
-  'retro', 'aurora', 'forest', 'berry', 'peach', 
-  'mint', 'lavender', 'coral', 'slate', 'midnight', 
-  'terra', 'neon'
+  'monochrome', 'sunset',  'ocean', 'retro', 'aurora',
+   'forest', 'berry', 'peach', 'emerald', 'neon',
+  'lavender', 'coral', 'slate', 'midnight', 'terra', 
+  'autumn', 'arctic', 'desert', 'violet', 'mint',
 ];
 
 export default function PaletteSelector({ value, onChange }: PaletteSelectorProps) {
   return (
-    <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5 sm:gap-2">
+    <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
       {PALETTES_LIST.map(palette => {
         const { colors, name } = PALETTE_OPTIONS[palette];
         return (
@@ -98,7 +111,7 @@ export default function PaletteSelector({ value, onChange }: PaletteSelectorProp
             className={`relative rounded-md overflow-hidden border-2 transition-all h-8 sm:h-10 ${
               value === palette
                 ? 'border-black dark:border-white shadow-md'
-                : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600'
+                : 'border-gray-300 dark:border-black hover:border-gray-400 dark:hover:border-gray-600'
             }`}
             title={name}
           >
