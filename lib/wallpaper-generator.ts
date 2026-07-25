@@ -14,7 +14,13 @@ export type PatternType =
   | 'crystal'
   | 'ripple'
   | 'cosmic'
-  | 'fluid-blob';
+  | 'fluid-blob'
+  | 'terrain-layers'
+  | 'liquid-blend'
+  | 'plasma-flow'
+  | 'mixed-fluid'
+  | 'sand-dunes'
+  | 'aurora-veil';
 
 export type PaletteType = 
   | 'monochrome' 
@@ -86,6 +92,12 @@ export const PATTERN_LABELS: Record<PatternType, string> = {
   ripple: 'Ripple',
   cosmic: 'Cosmic',
   'fluid-blob': 'Fluid Blob',
+  'terrain-layers': 'Terrain Layers',
+  'liquid-blend': 'Liquid Blend',
+  'plasma-flow': 'Plasma Flow',
+  'mixed-fluid': 'Mixed Fluid',
+  'sand-dunes': 'Sand Dunes',
+  'aurora-veil': 'Aurora Veil',
 };
 
 // Pseudo-random number generator (seeded)
@@ -177,6 +189,17 @@ export async function renderWallpaperToCanvas(
   height: number,
   config: WallpaperConfig
 ): Promise<HTMLCanvasElement> {
+  // The requested output size (e.g. desktop resolution).
+  const outWidth = width;
+  const outHeight = height;
+
+  // Render onto a square working canvas large enough to cover the full
+  // diagonal of the output rect. That way, no matter what rotation angle
+  // is applied, the cropped output never exposes an unpainted edge/corner.
+  const diag = Math.ceil(Math.sqrt(outWidth * outWidth + outHeight * outHeight));
+  width = diag;
+  height = diag;
+
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -708,6 +731,189 @@ export async function renderWallpaperToCanvas(
       ctx.fill();
       ctx.globalAlpha = 1;
     }
+  } else if (basePattern === 'terrain-layers') {
+    // Rolling parallax hills — softer and rounder than 'mountains', no sharp peaks.
+    const layerN = layers;
+    for (let i = 0; i < layerN; i++) {
+      const t = i / layerN;
+      const color = getLayerColor(palette, i, layerN, config.isReversed);
+      const yBase = height * (0.25 + t * 0.6);
+      const hillHeight = height * (0.06 + (1 - t) * 0.22) * config.scale;
+      const freq1 = 0.6 + t * 1.2;
+      const freq2 = 1.8 + t * 2.4;
+      const phase = i * 1.3 + config.seed;
+
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.75 + t * 0.25;
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      ctx.lineTo(0, yBase);
+
+      for (let x = 0; x <= width; x += width / 140) {
+        const n = perlinNoise(x / width * freq2, phase, config.seed + i * 17);
+        const rollingY =
+          yBase -
+          Math.sin(x / width * freq1 * Math.PI * 2 + phase) * hillHeight * 0.6 -
+          Math.cos(x / width * freq2 * Math.PI * 2 + phase * 0.7) * hillHeight * 0.25 -
+          n * hillHeight * 0.4 * config.randomness;
+        ctx.lineTo(x, rollingY);
+      }
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  } else if (basePattern === 'liquid-blend') {
+    // Soft, heavily blurred pools of color that melt directly into one another —
+    // no stroked outlines, no fills with a crisp boundary. Uses the canvas
+    // `filter: blur(...)` (the same CSS blur filter) on every shape before it's
+    // composited, so every edge in this pattern is genuinely soft.
+    const blobN = layers;
+    const blurAmount = Math.min(width, height) * (0.035 + config.randomness * 0.035);
+    const prevFilter = ctx.filter;
+
+    for (let i = 0; i < blobN; i++) {
+      const t = i / blobN;
+      const color = getLayerColor(palette, i, blobN, config.isReversed);
+      const cx = (0.1 + seededRandom(config.seed + i * 4) * 0.8) * width;
+      const cy = (0.12 + seededRandom(config.seed + i * 9) * 0.76) * height;
+      const rx = (0.16 + t * 0.3) * width * config.scale;
+      const ry = rx * (0.55 + seededRandom(config.seed + i * 13) * 0.75);
+      const rot = seededRandom(config.seed + i * 21) * Math.PI;
+
+      ctx.filter = `blur(${blurAmount * (0.6 + t * 0.8)}px)`;
+      ctx.globalAlpha = 0.32 + t * 0.34;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, rot, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.filter = prevFilter;
+  } else if (basePattern === 'plasma-flow') {
+    // Overlapping glow fields blended with 'lighter' compositing so edges dissolve
+    // into each other instead of reading as discrete circles/shapes.
+    const blobN = layers;
+    const prevComposite = ctx.globalCompositeOperation;
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < blobN; i++) {
+      const t = i / blobN;
+      const color = getLayerColor(palette, i, blobN, config.isReversed);
+      const cx = (0.12 + seededRandom(config.seed + i * 4) * 0.76) * width;
+      const cy = (0.12 + seededRandom(config.seed + i * 9) * 0.76) * height;
+      const r = (0.12 + t * 0.4) * Math.min(width, height) * config.scale * (0.6 + config.randomness * 0.4);
+
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      grad.addColorStop(0, color);
+      grad.addColorStop(0.5, color + '55');
+      grad.addColorStop(1, color + '00');
+      ctx.fillStyle = grad;
+      ctx.globalAlpha = 0.22 + t * 0.22;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = prevComposite;
+  } else if (basePattern === 'mixed-fluid') {
+    // Thick, heavily blurred streams of color that visibly mix into each other —
+    // like inks or paints stirred together in water. The blur filter keeps every
+    // edge soft, and a screen/multiply blend mode makes overlapping streams
+    // genuinely combine into new in-between colors rather than just stacking.
+    const streamN = layers;
+    const blurAmount = Math.min(width, height) * (0.018 + config.randomness * 0.018);
+    const prevFilter = ctx.filter;
+    const prevComposite = ctx.globalCompositeOperation;
+    ctx.globalCompositeOperation = config.isDark ? 'screen' : 'multiply';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    for (let i = 0; i < streamN; i++) {
+      const t = i / streamN;
+      const color = getLayerColor(palette, i, streamN, config.isReversed);
+      const segments = 70;
+      const stepLen = Math.min(width, height) * (0.018 + config.scale * 0.012);
+      const lw = (0.05 + (1 - t) * 0.14) * Math.min(width, height) * (0.5 + config.scale * 0.6);
+
+      let x = seededRandom(config.seed + i * 6) * width;
+      let y = seededRandom(config.seed + i * 11) * height;
+      let angle = seededRandom(config.seed + i * 17) * Math.PI * 2;
+
+      ctx.filter = `blur(${blurAmount}px)`;
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.4 + t * 0.3;
+      ctx.lineWidth = lw;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+
+      for (let s = 0; s < segments; s++) {
+        const n = perlinNoise(x / width * 3, y / height * 3, config.seed + i * 40 + s * 0.4);
+        angle += (n - 0.5) * 0.9 * config.randomness;
+        x += Math.cos(angle) * stepLen;
+        y += Math.sin(angle) * stepLen;
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.filter = prevFilter;
+    ctx.globalCompositeOperation = prevComposite;
+  } else if (basePattern === 'sand-dunes') {
+    // Very low-frequency, rounded crests — wide and slow, unlike jagged mountains.
+    const duneN = Math.max(3, Math.floor(layers * 0.6));
+    for (let i = 0; i < duneN; i++) {
+      const t = i / duneN;
+      const color = getLayerColor(palette, i, duneN, config.isReversed);
+      const yBase = height * (0.3 + t * 0.6);
+      const duneHeight = height * (0.05 + (1 - t) * 0.18) * config.scale;
+      const freq = 0.35 + t * 0.5;
+      const phase = i * 2.1 + config.seed;
+
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.8 + t * 0.2;
+      ctx.beginPath();
+      ctx.moveTo(0, height);
+      ctx.lineTo(0, yBase);
+
+      for (let x = 0; x <= width; x += width / 120) {
+        const n = perlinNoise(x / width * freq * 3, phase, config.seed + i * 31);
+        const crest = Math.pow(Math.sin(x / width * freq * Math.PI * 2 + phase) * 0.5 + 0.5, 1.5);
+        const y = yBase - crest * duneHeight - n * duneHeight * 0.3 * config.randomness;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(width, height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  } else if (basePattern === 'aurora-veil') {
+    // Vertical translucent curtains sweeping top-to-bottom, aurora-borealis style.
+    const veilN = layers;
+    for (let i = 0; i < veilN; i++) {
+      const t = i / veilN;
+      const color = getLayerColor(palette, i, veilN, config.isReversed);
+      const xBase = (0.08 + t * 0.84) * width;
+      const ampl = width * (0.06 + t * 0.14) * config.scale;
+      const freq = 0.7 + t * 1.3;
+      const phase = i * 0.8 + config.seed;
+
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.15 + t * 0.35;
+      ctx.lineWidth = (width * (0.015 + (1 - t) * 0.05)) * (1 + config.randomness * 0.5);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+
+      for (let y = 0; y <= height; y += height / 140) {
+        const n = perlinNoise(phase, y / height * freq * 1.3, config.seed + i * 41);
+        const x = xBase + Math.sin(y / height * freq * Math.PI * 2 + phase) * ampl + n * ampl * 0.6 * config.randomness;
+        if (y === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
   } else if (isBottomAligned) {
     const patternStartY = height * (1 - heightAdjustment);
     const patternHeight = height * heightAdjustment;
@@ -744,8 +950,20 @@ export async function renderWallpaperToCanvas(
   }
   
   ctx.restore();
-  
-  return canvas;
+
+  // Crop the centered outWidth x outHeight region out of the oversized
+  // (diag x diag) working canvas. Because the working canvas is at least as
+  // wide as the output rectangle's diagonal, this crop is always fully
+  // painted at any rotation angle — no empty edges or corners.
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = outWidth;
+  outCanvas.height = outHeight;
+  const outCtx = outCanvas.getContext('2d')!;
+  const srcX = (width - outWidth) / 2;
+  const srcY = (height - outHeight) / 2;
+  outCtx.drawImage(canvas, srcX, srcY, outWidth, outHeight, 0, 0, outWidth, outHeight);
+
+  return outCanvas;
 }
 
 export async function downloadWallpaper(
