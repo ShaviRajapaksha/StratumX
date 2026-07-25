@@ -161,3 +161,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom Slider styling for dark/light mode compatibility */
+@layer components {
+  .slider-input {
+    @apply w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-[#2a2a30] accent-black dark:accent-white transition-colors;
+  }
+
+  .slider-input::-webkit-slider-thumb {
+    @apply transition-transform duration-150 ease-in-out;
+  }
+
+  .slider-input::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+}
