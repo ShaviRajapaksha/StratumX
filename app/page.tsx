@@ -105,18 +105,18 @@ export default function Page() {
       {/* Header */}
       <header className={`border-b ${borderClass} ${bgClass} px-3 sm:px-8 py-3 sm:py-6`}>
         <div className="relative flex items-center justify-between max-w-full">
-          {/* Left - STRX and StratumXY (desktop) */}
+          {/* Left - STRXY and StratumXY (desktop) */}
           <div className="hidden lg:flex items-center gap-2 sm:gap-3">
             <div className={`${uiTheme === 'dark' ? 'bg-white text-black' : 'bg-black text-white'} px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-semibold`}>
-              STRX
+              STRXY
             </div>
             <h1 className="text-xl sm:text-3xl font-bold tracking-tight">StratumXY</h1>
           </div>
 
-          {/* Left - STRX only (mobile) */}
+          {/* Left - STRXY only (mobile) */}
           <div className="lg:hidden flex items-center">
             <div className={`${uiTheme === 'dark' ? 'bg-white text-black' : 'bg-black text-white'} px-2 py-1 rounded-lg text-xs font-semibold`}>
-              STRX
+              STRXY
             </div>
           </div>
 
