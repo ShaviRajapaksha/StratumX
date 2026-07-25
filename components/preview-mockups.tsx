@@ -1,4 +1,3 @@
-// preview-mockups.tsx
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -19,116 +18,195 @@ export default function PreviewMockups({
   const canvasPhoneRef = useRef<HTMLCanvasElement>(null);
 
   const [time, setTime] = useState('09:41');
-  const [date, setDate] = useState('Sunday, June 14, 1999');
+  const [date, setDate] = useState('Sunday, June 14');
+
+  // Detect dark mode
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDark);
+    };
+
+    checkDarkMode();
+
+    // Watch for class changes on html element
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
+
       const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
+
       setTime(`${hours}:${minutes}`);
+
       const formatter = new Intl.DateTimeFormat('en-US', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
       });
+
       setDate(formatter.format(now));
     };
+
     updateTime();
+
     const interval = setInterval(updateTime, 1000);
+
     return () => clearInterval(interval);
   }, []);
 
+  // Desktop wallpaper
   useEffect(() => {
     const render = async () => {
       if (!canvasDesktopRef.current) return;
-      const canvas = await renderWallpaperToCanvas(1600, 900, config);
+
+      const canvas = await renderWallpaperToCanvas(
+        1600,
+        900,
+        config
+      );
+
       const ctx = canvasDesktopRef.current.getContext('2d');
+
       if (ctx) {
         ctx.clearRect(0, 0, 1600, 900);
         ctx.drawImage(canvas, 0, 0);
       }
     };
+
     render();
   }, [config]);
 
+  // Phone wallpaper
   useEffect(() => {
     const render = async () => {
       if (!canvasPhoneRef.current) return;
-      const desktopCanvas = await renderWallpaperToCanvas(1600, 900, config);
+
+      const desktopCanvas = await renderWallpaperToCanvas(
+        1600,
+        900,
+        config
+      );
+
       const phoneAspectRatio = 9 / 19.5;
+
       const targetHeight = 900;
       const targetWidth = targetHeight * phoneAspectRatio;
+
       const cropX = (1600 - targetWidth) / 2;
 
       const phoneCanvas = document.createElement('canvas');
+
       phoneCanvas.width = 430;
       phoneCanvas.height = 930;
+
       const phoneCtx = phoneCanvas.getContext('2d');
+
       if (!phoneCtx) return;
 
       const palette = PALETTES[config.palette];
-      const bgColor = config.isReversed ? palette[0] : palette[palette.length - 1];
-      
+
+      const bgColor = config.isReversed
+        ? palette[0]
+        : palette[palette.length - 1];
+
       phoneCtx.fillStyle = bgColor;
       phoneCtx.fillRect(0, 0, 430, 930);
-      
+
       phoneCtx.drawImage(
         desktopCanvas,
-        cropX, 0, targetWidth, targetHeight,
-        0, 0, 430, 930
+        cropX,
+        0,
+        targetWidth,
+        targetHeight,
+        0,
+        0,
+        430,
+        930
       );
 
       const ctx = canvasPhoneRef.current.getContext('2d');
+
       if (ctx) {
         ctx.clearRect(0, 0, 430, 930);
         ctx.drawImage(phoneCanvas, 0, 0);
       }
     };
+
     render();
   }, [config]);
 
+  // Frame colors based on theme
+  const frameBorderColor = isDarkMode ? 'border-gray-10' : 'border-black';
+  const frameBgColor = isDarkMode ? 'bg-gray-10' : 'bg-black';
+  const frameShadowClass = isDarkMode ? 'shadow-white/5' : 'shadow-xl';
+
   return (
     <div
-      className="
+      className={`
+        w-full
         flex
         flex-row
         items-center
         justify-center
-        gap-3
-        sm:gap-5
-        md:gap-8
-        lg:gap-12
-        xl:gap-16
-        w-full
-        -translate-y-6
-        sm:-translate-y-8
-        md:-translate-y-10
-        lg:-translate-y-20
-      "
+
+        gap-2
+        sm:gap-4
+        md:gap-6
+        lg:gap-8
+        xl:gap-10
+
+        pt-5
+        sm:pt-4
+        md:pt-3
+        lg:pt-0
+
+        -translate-y-2
+        sm:-translate-y-3
+        md:-translate-y-4
+        lg:-translate-y-24
+      `}
     >
+      {/* DESKTOP */}
       <div className="relative">
         <div
-          className="
-            border-2
-            sm:border-3
-            md:border-4
-            lg:border-6
-            xl:border-8
-            border-black
-            rounded-xl
-            sm:rounded-2xl
-            lg:rounded-3xl
+          className={`
+            relative
+
+            h-[110px]
+            sm:h-[145px]
+            md:h-[190px]
+            lg:h-[250px]
+            xl:h-[300px]
+            2xl:h-[350px]
+
+            border
+            sm:border-2
+            md:border-3
+            lg:border-4
+            xl:border-5
+
+            ${frameBorderColor}
+            rounded-lg
+            sm:rounded-xl
+            lg:rounded-2xl
+
             overflow-hidden
-            shadow-2xl
-            bg-black
-            w-[210px]
-            sm:w-[280px]
-            md:w-[380px]
-            lg:w-[500px]
-            xl:w-[600px]
-            2xl:w-[700px]
-          "
+            shadow-lg
+            ${frameShadowClass}
+            ${frameBgColor}
+          `}
           style={{
             aspectRatio: '16/9',
           }}
@@ -143,8 +221,9 @@ export default function PreviewMockups({
             }}
           />
 
+          {/* Desktop Clock */}
           <div
-            className="
+            className={`
               absolute
               inset-0
               flex
@@ -152,36 +231,40 @@ export default function PreviewMockups({
               items-center
               justify-center
               pointer-events-none
-              -translate-y-8
-              sm:-translate-y-10
-              md:-translate-y-12
-              lg:-translate-y-16
-            "
+
+              -translate-y-4
+              sm:-translate-y-5
+              md:-translate-y-6
+              lg:-translate-y-18
+            `}
           >
             <div className="text-white text-center">
               <p
-                className="
-                  text-[7px]
-                  sm:text-[9px]
-                  md:text-xs
-                  lg:text-sm
+                className={`
+                  text-[6px]
+                  sm:text-[7px]
+                  md:text-[9px]
+                  lg:text-xs
+
                   opacity-70
-                  mb-1
-                  sm:mb-2
-                "
+                  mb-0.5
+                  sm:mb-1
+                `}
               >
                 {date}
               </p>
+
               <p
-                className="
-                  text-3xl
-                  sm:text-4xl
-                  md:text-5xl
-                  lg:text-7xl
-                  xl:text-8xl
+                className={`
+                  text-2xl
+                  sm:text-3xl
+                  md:text-4xl
+                  lg:text-5xl
+                  xl:text-6xl
+
                   font-light
                   tracking-tight
-                "
+                `}
               >
                 {time}
               </p>
@@ -190,46 +273,56 @@ export default function PreviewMockups({
         </div>
 
         <p
-          className="
+          className={`
             text-center
             text-gray-500
             dark:text-gray-400
-            text-[9px]
-            sm:text-[10px]
-            md:text-xs
+
+            text-[8px]
+            sm:text-[9px]
+            md:text-[10px]
+
             uppercase
             tracking-widest
-            mt-2
-            sm:mt-3
-            lg:mt-4
-          "
+
+            mt-1.5
+            sm:mt-2
+            lg:mt-3
+          `}
         >
           Desktop
         </p>
       </div>
 
+      {/* PHONE */}
       <div className="relative">
         <div
-          className="
-            border-2
-            sm:border-3
-            md:border-4
-            lg:border-6
-            xl:border-8
-            border-black
-            rounded-xl
-            sm:rounded-2xl
-            lg:rounded-3xl
+          className={`
+            relative
+
+            h-[110px]
+            sm:h-[145px]
+            md:h-[190px]
+            lg:h-[250px]
+            xl:h-[300px]
+            2xl:h-[350px]
+
+            border
+            sm:border-2
+            md:border-3
+            lg:border-4
+            xl:border-5
+
+            ${frameBorderColor}
+            rounded-lg
+            sm:rounded-xl
+            lg:rounded-2xl
+
             overflow-hidden
-            shadow-2xl
-            bg-black
-            w-[70px]
-            sm:w-[90px]
-            md:w-[110px]
-            lg:w-[145px]
-            xl:w-[165px]
-            2xl:w-[190px]
-          "
+            shadow-lg
+            ${frameShadowClass}
+            ${frameBgColor}
+          `}
           style={{
             aspectRatio: '9/19.5',
           }}
@@ -244,51 +337,73 @@ export default function PreviewMockups({
             }}
           />
 
+          {/* Phone Clock */}
           <div
-            className="
+            className={`
               absolute
               inset-0
               flex
+              flex-col
               items-center
               justify-center
               pointer-events-none
-              -translate-y-12
-              sm:-translate-y-16
-              md:-translate-y-20
-              lg:-translate-y-24
-            "
+
+              -translate-y-6
+              sm:-translate-y-8
+              md:-translate-y-10
+              lg:-translate-y-18
+            `}
           >
-            <p
-              className="
-                text-lg
-                sm:text-xl
-                md:text-2xl
-                lg:text-4xl
-                xl:text-5xl
-                font-light
-                tracking-tight
-                text-white
-              "
-            >
-              {time}
-            </p>
+            <div className="text-white text-center">
+              <p
+                className={`
+                  text-[4px]
+                  sm:text-[5px]
+                  md:text-[6px]
+                  lg:text-[7px]
+
+                  opacity-60
+                  mb-0.5
+                `}
+              >
+                {date}
+              </p>
+
+              <p
+                className={`
+                  text-sm
+                  sm:text-base
+                  md:text-lg
+                  lg:text-4xl
+                  xl:text-3xl
+
+                  font-light
+                  tracking-tight
+                `}
+              >
+                {time}
+              </p>
+            </div>
           </div>
         </div>
 
         <p
-          className="
+          className={`
             text-center
             text-gray-500
             dark:text-gray-400
-            text-[9px]
-            sm:text-[10px]
-            md:text-xs
+
+            text-[8px]
+            sm:text-[9px]
+            md:text-[10px]
+
             uppercase
             tracking-widest
-            mt-2
-            sm:mt-3
-            lg:mt-4
-          "
+
+            mt-1.5
+            sm:mt-2
+            lg:mt-3
+          `}
         >
           Phone
         </p>
