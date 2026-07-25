@@ -115,7 +115,7 @@ export default function Page() {
         <div className="flex items-center justify-between max-w-full">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className={`${uiTheme === 'dark' ? 'bg-white text-black' : 'bg-black text-white'} px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-semibold`}>
-              STR
+              STRX
             </div>
             <h1 className="text-xl sm:text-3xl font-bold tracking-tight">StratumX</h1>
           </div>
