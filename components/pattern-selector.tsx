@@ -1,11 +1,12 @@
 // pattern-selector.tsx
 'use client';
 
-import { PatternType, PATTERN_LABELS, renderWallpaperToCanvas } from '@/lib/wallpaper-generator';
+import { PatternType, PATTERN_LABELS, renderWallpaperToCanvas, PaletteType } from '@/lib/wallpaper-generator';
 import { useEffect, useRef } from 'react';
 
 interface PatternSelectorProps {
   value: PatternType;
+  palette: PaletteType;  // Add this prop
   onChange: (pattern: PatternType) => void;
 }
 
@@ -27,7 +28,7 @@ const PATTERNS: PatternType[] = [
   'aurora-veil',
 ];
 
-export default function PatternSelector({ value, onChange }: PatternSelectorProps) {
+export default function PatternSelector({ value, palette, onChange }: PatternSelectorProps) {
   const canvasRefs = useRef<Record<string, HTMLCanvasElement | null>>({});
 
   useEffect(() => {
@@ -38,8 +39,8 @@ export default function PatternSelector({ value, onChange }: PatternSelectorProp
         
         const canvas = await renderWallpaperToCanvas(120, 120, {
           pattern,
-          palette: 'monochrome',
-          isDark: true,
+          palette: palette,  // Use the passed palette instead of hardcoded
+          isDark: false,    // Set to false for better preview visibility
           isReversed: false,
           seed: 42,
           layerCount: 12,
@@ -57,7 +58,7 @@ export default function PatternSelector({ value, onChange }: PatternSelectorProp
       };
       render();
     });
-  }, []);
+  }, [palette]); // Re-run when palette changes
 
   return (
     <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
@@ -68,7 +69,7 @@ export default function PatternSelector({ value, onChange }: PatternSelectorProp
           className={`relative rounded-md overflow-hidden border-2 transition-all aspect-square ${
             value === pattern
               ? 'border-black dark:border-white shadow-md'
-              : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600'
+              : 'border-gray-400 dark:border-black hover:border-gray-400 dark:hover:border-gray-600'
           }`}
           title={PATTERN_LABELS[pattern]}
         >
