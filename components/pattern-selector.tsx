@@ -1,8 +1,8 @@
-// pattern-selector.tsx - Updated with new patterns
+// pattern-selector.tsx
 'use client';
 
-import { PatternType, renderWallpaperToCanvas } from '@/lib/wallpaper-generator';
-import { useEffect, useRef, useState } from 'react';
+import { PatternType, PATTERN_LABELS, renderWallpaperToCanvas } from '@/lib/wallpaper-generator';
+import { useEffect, useRef } from 'react';
 
 interface PatternSelectorProps {
   value: PatternType;
@@ -10,34 +10,22 @@ interface PatternSelectorProps {
 }
 
 const PATTERNS: PatternType[] = [
-  'stripes',           // 1st - Stripes (kept)
-  'layered-waves',     // 2nd - Layered Waves (new)
-  'mountains',         // 3rd - Mountains (kept)
-  'organic',           // 4th - Organic (kept)
-  'circles',           // 5th - Circles (kept)
-  'layered-arches',    // 6th - Layered Arches (new)
-  'geometric',         // 7th - Geometric (new)
-  'gradient-mesh',     // 8th - Gradient Mesh (new)
-  'topographic',       // 9th - Topographic (new)
-  'fluid-blob',        // 10th - Fluid Blob (new)
-  'stripes-bottom',    // Bottom-aligned stripes
-  'circles-bottom',    // Bottom-aligned circles
+  'stripes',
+  'layered-waves',
+  'mountains',
+  'organic',
+  'circles',
+  'layered-arches',
+  'geometric',
+  'gradient-mesh',
+  'liquid-mixed',
+  'abstract-flow',
+  'nebula',
+  'crystal',
+  'ripple',
+  'cosmic',
+  'fluid-blob',
 ];
-
-const PATTERN_LABELS: Record<PatternType, string> = {
-  stripes: 'Stripes',
-  'layered-waves': 'Layered Waves',
-  mountains: 'Mountains',
-  organic: 'Organic',
-  circles: 'Circles',
-  'layered-arches': 'Layered Arches',
-  geometric: 'Geometric',
-  'gradient-mesh': 'Gradient Mesh',
-  topographic: 'Topographic',
-  'fluid-blob': 'Fluid Blob',
-  'stripes-bottom': 'Stripes Bottom',
-  'circles-bottom': 'Circles Bottom',
-};
 
 export default function PatternSelector({ value, onChange }: PatternSelectorProps) {
   const canvasRefs = useRef<Record<string, HTMLCanvasElement | null>>({});
@@ -50,7 +38,7 @@ export default function PatternSelector({ value, onChange }: PatternSelectorProp
         
         const canvas = await renderWallpaperToCanvas(120, 120, {
           pattern,
-          palette: 'emerald',
+          palette: 'monochrome',
           isDark: true,
           isReversed: false,
           seed: 42,
@@ -63,6 +51,7 @@ export default function PatternSelector({ value, onChange }: PatternSelectorProp
         
         const ctx = canvasEl.getContext('2d');
         if (ctx) {
+          ctx.clearRect(0, 0, 120, 120);
           ctx.drawImage(canvas, 0, 0);
         }
       };
@@ -71,12 +60,12 @@ export default function PatternSelector({ value, onChange }: PatternSelectorProp
   }, []);
 
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+    <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
       {PATTERNS.map(pattern => (
         <button
           key={pattern}
           onClick={() => onChange(pattern)}
-          className={`relative rounded-lg overflow-hidden border-2 transition-all aspect-square ${
+          className={`relative rounded-md overflow-hidden border-2 transition-all aspect-square ${
             value === pattern
               ? 'border-black dark:border-white shadow-md'
               : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600'
@@ -92,7 +81,7 @@ export default function PatternSelector({ value, onChange }: PatternSelectorProp
             className="w-full h-full"
             style={{ display: 'block' }}
           />
-          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity" />
+          <div className="absolute inset-0 bg-black opacity-0 hover:opacity-10 transition-opacity" />
         </button>
       ))}
     </div>
