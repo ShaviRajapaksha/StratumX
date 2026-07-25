@@ -16,15 +16,15 @@ const PATTERNS: PatternType[] = [
   'organic',
   'circles',
   'layered-arches',
-  'geometric',
   'gradient-mesh',
-  'liquid-mixed',
-  'abstract-flow',
   'nebula',
-  'crystal',
-  'ripple',
-  'cosmic',
   'fluid-blob',
+  'terrain-layers',
+  'liquid-blend',
+  'plasma-flow',
+  'mixed-fluid',
+  'sand-dunes',
+  'aurora-veil',
 ];
 
 export default function PatternSelector({ value, onChange }: PatternSelectorProps) {
