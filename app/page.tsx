@@ -427,7 +427,7 @@ export default function Page() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-800 px-4 sm:px-8 py-4 sm:py-6">
+      <footer className={`border-t ${borderClass} px-4 sm:px-8 py-4 sm:py-6`}>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-gray-900 dark:text-white">StratumXY</span>
