@@ -17,8 +17,8 @@ export default function PreviewMockups({
   const canvasDesktopRef = useRef<HTMLCanvasElement>(null);
   const canvasPhoneRef = useRef<HTMLCanvasElement>(null);
 
-  const [time, setTime] = useState('09:41');
-  const [date, setDate] = useState('Sunday, June 14');
+  const [time, setTime] = useState('');
+  const [date, setDate] = useState('');
 
   // Detect dark mode
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -221,6 +221,34 @@ export default function PreviewMockups({
             }}
           />
 
+          {/* MacBook Pro M4 notch */}
+          <div
+            className={`
+              absolute
+              top-0
+              left-1/2
+              -translate-x-1/2
+              z-10
+
+              w-[14%]
+              sm:w-[20%]
+              md:w-[20%]
+              lg:w-[20%]
+
+              h-[5px]
+              sm:h-[9px]
+              md:h-[11px]
+              lg:h-[14px]
+              xl:h-[16px]
+
+              rounded-b-md
+              sm:rounded-b-lg
+
+              bg-black
+              pointer-events-none
+            `}
+          />
+
           {/* Desktop Clock */}
           <div
             className={`
@@ -245,10 +273,9 @@ export default function PreviewMockups({
                   sm:text-[7px]
                   md:text-[9px]
                   lg:text-xs
-
+                  mb-[-2.5]
                   opacity-70
-                  mb-0.5
-                  sm:mb-1
+                  
                 `}
               >
                 {date}
@@ -337,6 +364,36 @@ export default function PreviewMockups({
             }}
           />
 
+          {/* iPhone 17 Dynamic Island */}
+          <div
+            className={`
+              absolute
+              left-1/2
+              -translate-x-1/2
+              z-10
+
+              top-[2%]
+              sm:top-[2%]
+              md:top-[2%]
+
+              w-[26%]
+              sm:w-[24%]
+              md:w-[22%]
+              lg:w-[30%]
+
+              h-[5px]
+              sm:h-[10px]
+              md:h-[12px]
+              lg:h-[16px]
+              xl:h-[14px]
+
+              rounded-full
+
+              bg-black
+              pointer-events-none
+            `}
+          />
+
           {/* Phone Clock */}
           <div
             className={`
@@ -351,7 +408,7 @@ export default function PreviewMockups({
               -translate-y-6
               sm:-translate-y-8
               md:-translate-y-10
-              lg:-translate-y-18
+              lg:-translate-y-20
             `}
           >
             <div className="text-white text-center">
@@ -363,7 +420,7 @@ export default function PreviewMockups({
                   lg:text-[7px]
 
                   opacity-60
-                  mb-0.5
+                  mb-[-2.5]
                 `}
               >
                 {date}
