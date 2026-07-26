@@ -3544,22 +3544,70 @@ export async function renderWallpaperToCanvas(
   return outCanvas;
 }
 
+function isIOS(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  // Standard iOS UA check, plus iPadOS 13+ which reports as "MacIntel" but has touch support
+  const isAppleTouch =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (ua.includes('Macintosh') && navigator.maxTouchPoints > 1);
+  return isAppleTouch;
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error('Canvas toBlob returned null'));
+    }, 'image/png');
+  });
+}
+
 export async function downloadWallpaper(
   canvas: HTMLCanvasElement,
   filename: string
 ): Promise<void> {
-  const link =
-    document.createElement(
-      'a'
-    );
+  const blob = await canvasToBlob(canvas);
 
-  link.href =
-    canvas.toDataURL(
-      'image/png'
-    );
+  // On iOS, <a download> is unreliable (especially for large images) and can
+  // silently no-op. Prefer the native share sheet, which lets the user save
+  // directly to Photos/Files.
+  if (isIOS()) {
+    const file = new File([blob], filename, { type: 'image/png' });
 
-  link.download =
-    filename;
+    if (
+      typeof navigator !== 'undefined' &&
+      navigator.canShare &&
+      navigator.canShare({ files: [file] })
+    ) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch (err) {
+        // AbortError = user cancelled the share sheet, not a real failure.
+        if ((err as DOMException)?.name === 'AbortError') {
+          return;
+        }
+        // Any other error: fall through to the tab-open fallback below.
+        console.warn('navigator.share failed, falling back:', err);
+      }
+    }
 
+    // Fallback: open the image in a new tab so the user can long-press
+    // "Save Image" (works even without Web Share support).
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    return;
+  }
+
+  // Non-iOS (desktop browsers, Android): standard blob download link.
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
