@@ -152,12 +152,12 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Main Workspace */}
-      <div className="flex flex-1 flex-col lg:flex-row">
+      {/* Main Workspace - Removed padding from sides */}
+      <div className="flex flex-1 flex-col lg:flex-row min-h-0 gap-0 lg:gap-0 xl:gap-0 2xl:gap-0">
         {/* Left Sidebar - Pattern & Palette (Desktop) */}
-        <div className={`hidden lg:block w-72 border-r ${borderClass} ${bgClass} p-6 overflow-y-auto`}>
-          <div className="mb-6">
-            <h3 className={`text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-3`}>Patterns</h3>
+        <div className={`hidden lg:block lg:w-56 xl:w-64 2xl:w-72 border-r ${borderClass} ${bgClass} p-3 xl:p-4 2xl:p-6 overflow-y-auto flex-shrink-0`}>
+          <div className="mb-4 xl:mb-6">
+            <h3 className={`text-[10px] xl:text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-2 xl:mb-3`}>Patterns</h3>
             <PatternSelector
               value={config.pattern}
               palette={config.palette}
@@ -165,16 +165,16 @@ export default function Page() {
             />
           </div>
 
-          <div className="mb-6">
-            <h3 className={`text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-3`}>Palettes</h3>
+          <div className="mb-4 xl:mb-6">
+            <h3 className={`text-[10px] xl:text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-2 xl:mb-3`}>Palettes</h3>
             <PaletteSelector value={config.palette} onChange={handlePaletteChange} />
           </div>
 
-          <div className="mb-6">
-            <h3 className={`text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-3`}>Depth</h3>
+          <div className="mb-4 xl:mb-6">
+            <h3 className={`text-[10px] xl:text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-2 xl:mb-3`}>Depth</h3>
             <button
               onClick={() => handleReverseChange(!config.isReversed)}
-              className={`w-full px-4 py-2.5 rounded-lg transition-colors text-sm font-medium border ${
+              className={`w-full px-3 xl:px-4 py-1.5 xl:py-2.5 rounded-lg transition-colors text-xs xl:text-sm font-medium border ${
                 config.isReversed
                   ? `${uiTheme === 'dark' ? 'bg-[#2a2a30] border-[#3a3a44]' : 'bg-gray-100 border-gray-300'}`
                   : `border-gray-300 ${hoverClass}`
@@ -307,19 +307,31 @@ export default function Page() {
           </div>
         </div>
 
-        {/* Main Preview Area */}
-        <div className={`flex-1 flex flex-col items-center justify-center gap-4 sm:gap-8 p-3 sm:p-8 ${secondaryBgClass} order-1 lg:order-2`}>
-          <PreviewMockups config={config} />
+        {/*
+          Main Preview Area
+          NOTE: changed `justify-center` -> `justify-start` with `pt-*`.
+          The old `justify-center` combined with the parent `<main>` being
+          `min-h-screen` meant that whenever the viewport was taller than the
+          content actually needed, this column stretched to fill that extra
+          height and then centered the mockups within it - so the preview
+          visually drifted further down the taller the window got. Anchoring
+          it to the top keeps it a fixed distance from the header regardless
+          of viewport height; any extra space just becomes empty space below.
+        */}
+        <div className={`flex-1 flex flex-col items-center justify-start gap-4 sm:gap-8 pt-6 sm:pt-10 lg:pt-14 pb-2 sm:pb-4 lg:pb-6 ${secondaryBgClass} order-1 lg:order-2 min-w-0`}>
+          <div className="w-full max-w-full flex items-center justify-center">
+            <PreviewMockups config={config} />
+          </div>
         </div>
 
         {/* Right Sidebar - Advanced Controls & Download (Desktop) */}
-        <div className={`hidden lg:block w-72 border-l ${borderClass} ${bgClass} p-6 overflow-y-auto order-3`}>
-          <div className="mb-6">
-            <h3 className={`text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-4`}>Advanced</h3>
+        <div className={`hidden lg:block lg:w-56 xl:w-64 2xl:w-72 border-l ${borderClass} ${bgClass} p-3 xl:p-4 2xl:p-6 overflow-y-auto order-3 flex-shrink-0`}>
+          <div className="mb-4 xl:mb-6">
+            <h3 className={`text-[10px] xl:text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-3 xl:mb-4`}>Advanced</h3>
 
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className={`text-xs font-medium ${textSecondaryClass}`}>Layers: {config.layerCount}</label>
+            <div className="mb-3 xl:mb-4">
+              <div className="flex items-center justify-between mb-1.5 xl:mb-2">
+                <label className={`text-[10px] xl:text-xs font-medium ${textSecondaryClass}`}>Layers: {config.layerCount}</label>
               </div>
               <input
                 type="range"
@@ -331,9 +343,9 @@ export default function Page() {
               />
             </div>
 
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className={`text-xs font-medium ${textSecondaryClass}`}>Randomness: {config.randomness.toFixed(2)}</label>
+            <div className="mb-3 xl:mb-4">
+              <div className="flex items-center justify-between mb-1.5 xl:mb-2">
+                <label className={`text-[10px] xl:text-xs font-medium ${textSecondaryClass}`}>Randomness: {config.randomness.toFixed(2)}</label>
               </div>
               <input
                 type="range"
@@ -346,9 +358,9 @@ export default function Page() {
               />
             </div>
 
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className={`text-xs font-medium ${textSecondaryClass}`}>Scale: {config.scale.toFixed(2)}</label>
+            <div className="mb-3 xl:mb-4">
+              <div className="flex items-center justify-between mb-1.5 xl:mb-2">
+                <label className={`text-[10px] xl:text-xs font-medium ${textSecondaryClass}`}>Scale: {config.scale.toFixed(2)}</label>
               </div>
               <input
                 type="range"
@@ -361,9 +373,9 @@ export default function Page() {
               />
             </div>
 
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className={`text-xs font-medium ${textSecondaryClass}`}>Rotation: {config.rotation}°</label>
+            <div className="mb-3 xl:mb-4">
+              <div className="flex items-center justify-between mb-1.5 xl:mb-2">
+                <label className={`text-[10px] xl:text-xs font-medium ${textSecondaryClass}`}>Rotation: {config.rotation}°</label>
               </div>
               <input
                 type="range"
@@ -377,39 +389,39 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="mb-6">
-            <h3 className={`text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-3`}>Variation</h3>
+          <div className="mb-4 xl:mb-6">
+            <h3 className={`text-[10px] xl:text-xs font-semibold uppercase tracking-widest ${textSecondaryClass} mb-2 xl:mb-3`}>Variation</h3>
             <button
               onClick={handleGenerateNew}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 border ${borderClass} rounded-lg transition-colors text-sm font-medium ${hoverClass}`}
+              className={`w-full flex items-center justify-center gap-2 px-3 xl:px-4 py-1.5 xl:py-2.5 border ${borderClass} rounded-lg transition-colors text-xs xl:text-sm font-medium ${hoverClass}`}
             >
-              <RotateCw className="w-4 h-4" />
+              <RotateCw className="w-3 h-3 xl:w-4 xl:h-4" />
               Generate New
             </button>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1.5 xl:space-y-2">
             <button
               onClick={() => handleDownload('desktop')}
               disabled={isDownloading}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 ${
+              className={`w-full flex items-center justify-center gap-2 px-3 xl:px-4 py-1.5 xl:py-2.5 ${
                 uiTheme === 'dark' ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
-              } rounded-lg transition-colors text-sm font-medium disabled:opacity-50`}
+              } rounded-lg transition-colors text-xs xl:text-sm font-medium disabled:opacity-50`}
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3 h-3 xl:w-4 xl:h-4" />
               Download Desktop
             </button>
-            <div className={`text-center text-xs ${textSecondaryClass}`}>3840 × 2160 px</div>
+            <div className={`text-center text-[9px] xl:text-xs ${textSecondaryClass}`}>3840 × 2160 px</div>
 
             <button
               onClick={() => handleDownload('mobile')}
               disabled={isDownloading}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 border ${borderClass} rounded-lg transition-colors text-sm font-medium ${hoverClass} disabled:opacity-50`}
+              className={`w-full flex items-center justify-center gap-2 px-3 xl:px-4 py-1.5 xl:py-2.5 border ${borderClass} rounded-lg transition-colors text-xs xl:text-sm font-medium ${hoverClass} disabled:opacity-50`}
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3 h-3 xl:w-4 xl:h-4" />
               Download Phone
             </button>
-            <div className={`text-center text-xs ${textSecondaryClass}`}>1290 × 2160 px</div>
+            <div className={`text-center text-[9px] xl:text-xs ${textSecondaryClass}`}>1290 × 2160 px</div>
           </div>
         </div>
       </div>
