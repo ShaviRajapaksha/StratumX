@@ -148,7 +148,7 @@ export default function PreviewMockups({
   }, [config]);
 
   // Frame colors based on theme
-  const frameBorderColor = isDarkMode ? 'border-gray-10' : 'border-black';
+  const frameBorderColor = isDarkMode ? 'border-black' : 'border-black';
   const frameBgColor = isDarkMode ? 'bg-gray-10' : 'bg-black';
   const frameShadowClass = isDarkMode ? 'shadow-white/5' : 'shadow-xl';
 
