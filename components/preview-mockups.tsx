@@ -162,34 +162,25 @@ export default function PreviewMockups({
         justify-center
 
         gap-2
-        sm:gap-4
-        md:gap-6
-        lg:gap-8
-        xl:gap-10
-
-        pt-5
-        sm:pt-4
-        md:pt-3
-        lg:pt-0
-
-        -translate-y-2
-        sm:-translate-y-3
-        md:-translate-y-4
-        lg:-translate-y-24
+        sm:gap-3
+        md:gap-4
+        lg:gap-6
+        xl:gap-8
+        2xl:gap-10
       `}
     >
       {/* DESKTOP */}
-      <div className="relative">
+      <div className="relative flex-shrink-0">
         <div
           className={`
             relative
 
-            h-[110px]
-            sm:h-[145px]
-            md:h-[190px]
-            lg:h-[250px]
-            xl:h-[300px]
-            2xl:h-[350px]
+            h-[120px]
+            sm:h-[160px]
+            md:h-[200px]
+            lg:h-[220px]
+            xl:h-[260px]
+            2xl:h-[320px]
 
             border
             sm:border-2
@@ -231,18 +222,18 @@ export default function PreviewMockups({
               z-10
 
               w-[14%]
-              sm:w-[20%]
+              sm:w-[18%]
               md:w-[20%]
               lg:w-[20%]
 
-              h-[5px]
-              sm:h-[9px]
-              md:h-[11px]
-              lg:h-[14px]
-              xl:h-[16px]
+              h-[4px]
+              sm:h-[7px]
+              md:h-[9px]
+              lg:h-[11px]
+              xl:h-[14px]
 
               rounded-b-md
-              sm:rounded-b-lg
+              sm:rounded-b-sm
 
               bg-black
               pointer-events-none
@@ -260,22 +251,26 @@ export default function PreviewMockups({
               justify-center
               pointer-events-none
 
-              -translate-y-4
-              sm:-translate-y-5
-              md:-translate-y-6
-              lg:-translate-y-18
+              -translate-y-6
+              sm:-translate-y-10
+              md:-translate-y-14
+              lg:-translate-y-14
+              xl:-translate-y-18
             `}
           >
             <div className="text-white text-center">
               <p
                 className={`
-                  text-[6px]
-                  sm:text-[7px]
-                  md:text-[9px]
-                  lg:text-xs
-                  mb-[-2.5]
+                  text-[5px]
+                  sm:text-[6px]
+                  md:text-[8px]
+                  lg:text-[9px]
+                  xl:text-[10px]
+                  2xl:text-xs
+                  mb-[-1px]
+                  sm:mb-[-2px]
+                  md:mb-[-2.5]
                   opacity-70
-                  
                 `}
               >
                 {date}
@@ -283,11 +278,12 @@ export default function PreviewMockups({
 
               <p
                 className={`
-                  text-2xl
-                  sm:text-3xl
-                  md:text-4xl
-                  lg:text-5xl
-                  xl:text-6xl
+                  text-xl
+                  sm:text-2xl
+                  md:text-3xl
+                  lg:text-4xl
+                  xl:text-5xl
+                  2xl:text-6xl
 
                   font-light
                   tracking-tight
@@ -305,16 +301,17 @@ export default function PreviewMockups({
             text-gray-500
             dark:text-gray-400
 
-            text-[8px]
-            sm:text-[9px]
-            md:text-[10px]
+            text-[7px]
+            sm:text-[8px]
+            md:text-[9px]
+            lg:text-[10px]
 
             uppercase
             tracking-widest
 
-            mt-1.5
-            sm:mt-2
-            lg:mt-3
+            mt-1
+            sm:mt-1.5
+            lg:mt-2
           `}
         >
           Desktop
@@ -322,17 +319,17 @@ export default function PreviewMockups({
       </div>
 
       {/* PHONE */}
-      <div className="relative">
+      <div className="relative flex-shrink-0">
         <div
           className={`
             relative
 
-            h-[110px]
-            sm:h-[145px]
-            md:h-[190px]
-            lg:h-[250px]
-            xl:h-[300px]
-            2xl:h-[350px]
+            h-[120px]
+            sm:h-[160px]
+            md:h-[200px]
+            lg:h-[220px]
+            xl:h-[260px]
+            2xl:h-[320px]
 
             border
             sm:border-2
@@ -364,7 +361,7 @@ export default function PreviewMockups({
             }}
           />
 
-          {/* iPhone 17 Dynamic Island */}
+          {/* iPhone Dynamic Island */}
           <div
             className={`
               absolute
@@ -375,17 +372,21 @@ export default function PreviewMockups({
               top-[2%]
               sm:top-[2%]
               md:top-[2%]
+              lg:top-[2%]
+              xl:top-[2%]
 
-              w-[26%]
-              sm:w-[24%]
-              md:w-[22%]
-              lg:w-[30%]
+              w-[25%]
+              sm:w-[28%]
+              md:w-[30%]
+              lg:w-[32%]
+              xl:w-[30%]
 
               h-[5px]
-              sm:h-[10px]
-              md:h-[12px]
-              lg:h-[16px]
-              xl:h-[14px]
+              sm:h-[7px]
+              md:h-[9px]
+              lg:h-[11px]
+              xl:h-[13px]
+              2xl:h-[15px]
 
               rounded-full
 
@@ -405,22 +406,29 @@ export default function PreviewMockups({
               justify-center
               pointer-events-none
 
-              -translate-y-6
-              sm:-translate-y-8
-              md:-translate-y-10
-              lg:-translate-y-20
+              -translate-y-8
+              sm:-translate-y-10
+              md:-translate-y-14
+              lg:-translate-y-14
+              xl:-translate-y-18
             `}
           >
             <div className="text-white text-center">
               <p
                 className={`
-                  text-[4px]
-                  sm:text-[5px]
-                  md:text-[6px]
-                  lg:text-[7px]
+                  text-[3px]
+                  sm:text-[4px]
+                  md:text-[5px]
+                  lg:text-[6px]
+                  xl:text-[7px]
+                  2xl:text-[8px]
 
                   opacity-60
-                  mb-[-2.5]
+                  mb-[-1px]
+                  sm:mb-[-1.5px]
+                  md:mb-[-2px]
+                  lg:mb-[-3px]
+                  xl:mb-[-3.5px]
                 `}
               >
                 {date}
@@ -428,11 +436,12 @@ export default function PreviewMockups({
 
               <p
                 className={`
-                  text-sm
-                  sm:text-base
-                  md:text-lg
-                  lg:text-4xl
-                  xl:text-3xl
+                  text-xs
+                  sm:text-sm
+                  md:text-base
+                  lg:text-xl
+                  xl:text-2xl
+                  2xl:text-3xl
 
                   font-light
                   tracking-tight
@@ -450,16 +459,17 @@ export default function PreviewMockups({
             text-gray-500
             dark:text-gray-400
 
-            text-[8px]
-            sm:text-[9px]
-            md:text-[10px]
+            text-[7px]
+            sm:text-[8px]
+            md:text-[9px]
+            lg:text-[10px]
 
             uppercase
             tracking-widest
 
-            mt-1.5
-            sm:mt-2
-            lg:mt-3
+            mt-1
+            sm:mt-1.5
+            lg:mt-2
           `}
         >
           Phone
