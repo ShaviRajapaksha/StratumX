@@ -6,6 +6,8 @@ StratumXY is a modern wallpaper generation application designed to transform pro
 
 The platform combines configurable visual layers, procedural generation, curated color systems, responsive device previews, and controlled randomization to create an effectively unlimited number of unique wallpaper compositions.
 
+<img width="1419" height="694" alt="Screenshot 2026-07-26 at 15 41 57" src="https://github.com/user-attachments/assets/62436af0-059b-4f45-a373-cfbabb6b34db" />
+
 ---
 
 ## Overview
