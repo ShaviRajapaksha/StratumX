@@ -178,9 +178,9 @@ export default function PreviewMockups({
             h-[120px]
             sm:h-[160px]
             md:h-[200px]
-            lg:h-[220px]
-            xl:h-[260px]
-            2xl:h-[320px]
+            lg:h-[240px]
+            xl:h-[300px]
+            2xl:h-[360px]
 
             border
             sm:border-2
@@ -226,14 +226,19 @@ export default function PreviewMockups({
               md:w-[20%]
               lg:w-[20%]
 
-              h-[4px]
+              h-[7px]
               sm:h-[7px]
               md:h-[9px]
-              lg:h-[11px]
-              xl:h-[14px]
+              lg:h-[12px]
+              xl:h-[15px]
+              2xl:h-[18px]
 
-              rounded-b-md
-              sm:rounded-b-sm
+              rounded-b-[1.5px]
+              sm:rounded-b-[2.5px]
+              md:rounded-b-[3px]
+              lg:rounded-b-[4px]
+              xl:rounded-b-[5.5px]
+              2xl:rounded-b-[7px]
 
               bg-black
               pointer-events-none
@@ -254,8 +259,9 @@ export default function PreviewMockups({
               -translate-y-6
               sm:-translate-y-10
               md:-translate-y-14
-              lg:-translate-y-14
-              xl:-translate-y-18
+              lg:-translate-y-16
+              xl:-translate-y-20
+              2xl:-translate-y-24
             `}
           >
             <div className="text-white text-center">
@@ -264,12 +270,12 @@ export default function PreviewMockups({
                   text-[5px]
                   sm:text-[6px]
                   md:text-[8px]
-                  lg:text-[9px]
-                  xl:text-[10px]
-                  2xl:text-xs
+                  lg:text-[10px]
+                  xl:text-xs
+                  2xl:text-sm
                   mb-[-1px]
                   sm:mb-[-2px]
-                  md:mb-[-2.5]
+                  md:mb-[-2.5px]
                   opacity-70
                 `}
               >
@@ -305,6 +311,7 @@ export default function PreviewMockups({
             sm:text-[8px]
             md:text-[9px]
             lg:text-[10px]
+            xl:text-[11px]
 
             uppercase
             tracking-widest
@@ -327,9 +334,9 @@ export default function PreviewMockups({
             h-[120px]
             sm:h-[160px]
             md:h-[200px]
-            lg:h-[220px]
-            xl:h-[260px]
-            2xl:h-[320px]
+            lg:h-[240px]
+            xl:h-[300px]
+            2xl:h-[360px]
 
             border
             sm:border-2
@@ -370,10 +377,6 @@ export default function PreviewMockups({
               z-10
 
               top-[2%]
-              sm:top-[2%]
-              md:top-[2%]
-              lg:top-[2%]
-              xl:top-[2%]
 
               w-[25%]
               sm:w-[28%]
@@ -384,9 +387,9 @@ export default function PreviewMockups({
               h-[5px]
               sm:h-[7px]
               md:h-[9px]
-              lg:h-[11px]
-              xl:h-[13px]
-              2xl:h-[15px]
+              lg:h-[12px]
+              xl:h-[15px]
+              2xl:h-[18px]
 
               rounded-full
 
@@ -409,8 +412,9 @@ export default function PreviewMockups({
               -translate-y-8
               sm:-translate-y-10
               md:-translate-y-14
-              lg:-translate-y-14
-              xl:-translate-y-18
+              lg:-translate-y-16
+              xl:-translate-y-20
+              2xl:-translate-y-24
             `}
           >
             <div className="text-white text-center">
@@ -419,9 +423,9 @@ export default function PreviewMockups({
                   text-[3px]
                   sm:text-[4px]
                   md:text-[5px]
-                  lg:text-[6px]
-                  xl:text-[7px]
-                  2xl:text-[8px]
+                  lg:text-[7px]
+                  xl:text-[9px]
+                  2xl:text-[10px]
 
                   opacity-60
                   mb-[-1px]
@@ -463,6 +467,7 @@ export default function PreviewMockups({
             sm:text-[8px]
             md:text-[9px]
             lg:text-[10px]
+            xl:text-[11px]
 
             uppercase
             tracking-widest
